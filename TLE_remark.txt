@@ -1,0 +1,45 @@
+NK010015
+NK010017
+NK030012
+NK040016
+NK050009
+NK050020
+NK050023
+NK060021
+NK060022
+NK060026
+
+
+想一隻C#程式，我要讀取txt檔案，多個題目檔案，裡面的每題格式會是 "題碼：NK010001[Internet Operations and Applications]
+下列網路應用與傳輸層協定的搭配比較哪一項不適合？
+(A) 視訊會議採取 UDP 協定
+(B) 互動式遊戲採取 UDP 協定 
+(C) 串流影音採取 TCP 協定 
+(D) 網路購物採取 TCP 協定
+觀看解答
+解答：C"，我要將上述轉換成下列
+{"sn":"001","class":"書本第一章-永續基本概念","question":"ESG涵蓋內容不包含以下何者？","options":[{"option":"社會責任","answer":false},{"option":"環境保護","answer":false},{"option":"公司治理","answer":false},{"option":"政府保護","answer":true}],"remark":"ESG是3個英文單字的縮寫，分別是環境保護(E即environment)、社會責任(S即social)和公司治理(G即governance)，聯合國全球契約(UNGlobalCompact)於2004年首次提出ESG的概念，被視為評估一間企業經營的指標。","felo":"","pic":""}
+
+1. sn代表流水號幫我編排
+2. class 代表原本題目題碼: []內的內容
+3. question 會是題碼的下一行，從開始到?作為結束，做多一~四行
+4. options對應? 後面的(A)~(D)預設false，看到觀看答案算結束
+5. 觀看解答的下一行，解答: 後面的答案，取得後ABCD，則上述取得的對應到options後面要改成true
+6. remark ,felo ,pic都先空白
+
+
+NK010015
+
+https://weichen5700.github.io/TLE/info.html
+
+
+https://weichen5700.github.io/TLE/img/NK010015.png
+https://weichen5700.github.io/TLE/img/NK010017.png
+https://weichen5700.github.io/TLE/img/NK030012.png
+https://weichen5700.github.io/TLE/img/NK040016.png
+https://weichen5700.github.io/TLE/img/NK050009.png
+https://weichen5700.github.io/TLE/img/NK050020.png
+https://weichen5700.github.io/TLE/img/NK050023.png
+https://weichen5700.github.io/TLE/img/NK060021.png
+https://weichen5700.github.io/TLE/img/NK060022.png
+https://weichen5700.github.io/TLE/img/NK060026.png
