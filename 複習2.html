@@ -225,10 +225,71 @@
                 font-size: 1em;
             }
             .navbar-toggler {
-                padding: 0.25rem 0.5rem;
-                background-color: #fff;
-                border: 1px solid #ccc;
-            }
+				width: 45px;
+				height: 45px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-color: white;
+				border: 2px solid #ccc;
+				border-radius: 8px;
+				padding: 0;
+				transition: background-color 0.3s, box-shadow 0.3s;
+			}
+
+			.navbar-toggler:hover {
+				background-color: #f0f0f0;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.custom-toggler-icon {
+				width: 70%;
+				height: 4px;
+				background-color: black;
+				position: relative;
+				border-radius: 2px;
+				transition: background-color 0.3s ease-in-out;
+			}
+
+			/* 叉叉的兩條線 */
+			.custom-toggler-icon::before,
+			.custom-toggler-icon::after {
+				content: "";
+				position: absolute;
+				left: 50%; /* 讓它從正中心開始 */
+				width: 100%;
+				height: 4px;
+				background-color: black;
+				border-radius: 2px;
+				transition: transform 0.3s ease-in-out;
+				transform-origin: center; /* 讓旋轉以中心點為基準 */
+			}
+
+			.custom-toggler-icon::before {
+				top: -10px;
+				transform: translateX(-50%);
+			}
+
+			.custom-toggler-icon::after {
+				top: 10px;
+				transform: translateX(-50%);
+			}
+
+			/* 🔥 修正變叉叉時的對齊 */
+			.navbar-toggler[aria-expanded="true"] .custom-toggler-icon {
+				background-color: transparent;
+			}
+
+			.navbar-toggler[aria-expanded="true"] .custom-toggler-icon::before {
+				transform: translateX(-50%) rotate(45deg);
+				top: 0; /* 確保變形後在正中心 */
+			}
+
+			.navbar-toggler[aria-expanded="true"] .custom-toggler-icon::after {
+				transform: translateX(-50%) rotate(-45deg);
+				top: 0; /* 確保變形後在正中心 */
+			}
+
             #collapseSettings {
                 background-color: #fff;
                 border-radius: 0.625rem;
@@ -379,7 +440,7 @@
             <div class="col-12 progress-header">
                 <strong>當前題號/總題數:</strong> <span id="current-question">0</span>/<span id="total-questions">0</span>
                 <button class="navbar-toggler d-md-none float-end" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="custom-toggler-icon"></span>
                 </button>
                 <button class="btn btn-secondary d-none d-md-inline-block float-end" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
                     顯示/隱藏設定
