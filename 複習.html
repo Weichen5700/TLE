@@ -70,7 +70,7 @@
       box-shadow: 0 0.5rem 1rem rgba(255, 183, 77, 0.4);
     }
     .option.answer {
-      background-color: #fcf8f3;
+       background-color: #fff3a6;
       color: #343a40;
     }
     .remark {
@@ -896,7 +896,7 @@
         options.forEach(option => {
           if (option.dataset.answer === 'true') {
             option.classList.add('answer');
-            option.style.backgroundColor = '#fcf8f3';
+            option.style.backgroundColor = '#fff3a6';
             option.style.color =  '#343a40';
           } else {
             option.style.backgroundColor = 'white';
@@ -984,7 +984,7 @@
         const options = document.querySelectorAll('.option');
         options.forEach(option => {
           if (option.dataset.answer === 'true') {
-            option.style.backgroundColor =  '#fcf8f3';
+            option.style.backgroundColor =  '#fff3a6';
             option.style.color = '#343a40';
           }
         });
