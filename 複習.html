@@ -1345,17 +1345,23 @@
 
     // 點選小按鈕後模擬答題動作
     function selectOption(optionIndex) {
-      const options = document.querySelectorAll('.option');
-      if (optionIndex < options.length) {
-        const optionElement = options[optionIndex];
-        const checkbox = optionElement.querySelector('.answer-checkbox');
-        if (checkbox) {
-          checkbox.checked = true;
-          // 單選題直接檢查答案；複選題依需求自行調整
-          checkAnswer(checkbox);
-        }
+  const options = document.querySelectorAll('.option');
+  if (optionIndex < options.length) {
+    const optionElement = options[optionIndex];
+    const checkbox = optionElement.querySelector('.answer-checkbox');
+    if (checkbox) {
+      if (isMultipleChoice) {
+        // 複選題：只切換勾選狀態，不送出答案
+        checkbox.checked = !checkbox.checked;
+      } else {
+        // 單選題：自動勾選並送出答案
+        checkbox.checked = true;
+        checkAnswer(checkbox);
       }
     }
+  }
+}
+
   </script>
 </body>
 </html>
