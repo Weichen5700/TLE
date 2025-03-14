@@ -964,11 +964,7 @@
       const allCheckboxes = document.querySelectorAll('.answer-checkbox');
       allCheckboxes.forEach(cb => cb.disabled = true);
       const optionElement = checkbox.closest('.option');
-      const isCorrect = optionElement.dataset.answer === 'true';
-		if (!isCorrect) {
-		// 將選擇錯誤的選項文字顯示為紅色
-		optionElement.style.color = 'red';
-		}
+      const isCorrect = optionElement.dataset.answer === 'true';		
       showResult(isCorrect);
     }
 
@@ -981,8 +977,7 @@
         const isCorrect = optionElement.dataset.answer === 'true';
         if (checkbox.checked) {
           anySelected = true;
-          if (!isCorrect) allCorrect = false;
-		    optionElement.style.color = 'red';
+          if (!isCorrect) allCorrect = false;		  
         }
         if (!checkbox.checked && isCorrect) allCorrect = false;
       });
