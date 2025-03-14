@@ -993,28 +993,31 @@
     const correctSound = new Audio('correct_sound.mp3');
     const errorSound = new Audio('error_sound.mp3');
 
-    function showResult(isCorrect) {
-      const resultMessage = document.createElement('div');
-      resultMessage.classList.add('result-message');
-      if (isCorrect) {
-        correctCount++;
-        resultMessage.textContent = '✔ 正確';
-        resultMessage.style.color = 'green';
-        resultMessage.style.backgroundColor = '#d4edda';
-        playCorrectSound();
-      } else {
-        triggerWarning();
-        playErrorSound();
-        incorrectCount++;
-        resultMessage.textContent = '✖ 錯誤';
-        resultMessage.style.color = 'red';
-        resultMessage.style.backgroundColor = '#f8d7da';
-        revealAnswer({ target: document.getElementById('question-container') });
-      }
-      document.querySelector('.question-content').appendChild(resultMessage);
-      setTimeout(() => resultMessage.remove(), 2000);
-      updateAnswerCount();
-    }
+   function showResult(isCorrect) {
+	  const resultMessage = document.createElement('div');
+	  resultMessage.classList.add('result-message');
+	  if (isCorrect) {
+		correctCount++;
+		resultMessage.textContent = '✔ 正確';
+		resultMessage.style.color = 'green';
+		resultMessage.style.backgroundColor = '#d4edda';
+		playCorrectSound();
+	  } else {
+		triggerWarning();
+		playErrorSound();
+		incorrectCount++;
+		resultMessage.textContent = '✖ 錯誤';
+		resultMessage.style.color = 'red';
+		resultMessage.style.backgroundColor = '#f8d7da';
+	  }
+	  
+	  // 送出答案後無論對錯，都高亮正確的選項
+	  highlightCorrectOptions();
+
+	  document.querySelector('.question-content').appendChild(resultMessage);
+	  setTimeout(() => resultMessage.remove(), 2000);
+	  updateAnswerCount();
+	}
 
     function playCorrectSound() {
       correctSound.play();
@@ -1383,6 +1386,20 @@
         <button class="btn btn-primary" onclick="nextQuestion()">下一題</button>
       `;
     }
+	function highlightCorrectOptions() {
+	  const options = document.querySelectorAll('.option');
+	  options.forEach(option => {
+		if (option.dataset.answer === 'true') {
+		  // 設定黃底與深色文字
+		  option.style.backgroundColor = '#fff3a6';
+		  option.style.color = '#343a40';
+		  // 如果你有需要也可以加上 .answer class
+		  option.classList.add('answer');
+		}
+	  });
+	}
+
+
 
     function selectOption(optionIndex) {
       const options = document.querySelectorAll('.option');
