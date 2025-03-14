@@ -59,14 +59,16 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    .option {
-      background-color: white;
-      color: black;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      border-radius: 0.3125rem;
-      transition: background-color 0.3s, color 0.3s;
-    }
+		 .option {
+		  display: block;
+		  /* 原有樣式保持不變 */
+		  background-color: white;
+		  color: black;
+		  padding: 0.75rem;
+		  margin-bottom: 0.5rem;
+		  border-radius: 0.3125rem;
+		  transition: background-color 0.3s, color 0.3s;
+		}
     .options div:hover {
       background-color: #ffb74d;    
       transform-origin: top left;
@@ -729,12 +731,12 @@
         <div class="question-content" style="position: relative;">
           <h3>題目 ${q.sn}: <span class="question-class">[${q.class}]</span> ${q.question}</h3>
           <div class="options">
-            ${options.map((opt, i) => 
-              `<div class="option" data-answer="${opt.answer}" data-text="選項 ${i + 1}: ${opt.option}">
-                <input type="checkbox" class="answer-checkbox" id="option-${i}">
-                <label for="option-${i}">選項 ${i + 1}: ${opt.option}</label>
-              </div>`
-            ).join('')}
+          ${options.map((opt, i) => 
+			  `<label class="option" data-answer="${opt.answer}" data-text="選項 ${i + 1}: ${opt.option}" for="option-${i}">
+				<input type="checkbox" class="answer-checkbox" id="option-${i}">
+				選項 ${i + 1}: ${opt.option}
+			  </label>`
+			).join('')}
           </div>
           <div class="remark" style="display: block;">備註: ${q.remark || '無'}</div>
           <div class="felo" style="display: block;">Felo: ${q.felo || '無'}</div>
