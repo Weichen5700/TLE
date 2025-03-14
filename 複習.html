@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 禁用縮放以移除雙擊縮放功能 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>114年TLE考題複習</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
@@ -70,7 +71,7 @@
       box-shadow: 0 0.5rem 1rem rgba(255, 183, 77, 0.4);
     }
     .option.answer {
-       background-color: #fff3a6;
+      background-color: #fff3a6;
       color: #343a40;
     }
     .remark {
@@ -283,7 +284,7 @@
         display: block;
       }
       #copy-search-button {
-        display: none !important; /* 手機版強制隱藏右下角按鈕 */
+        display: none !important;
       }
     }
     @media (min-width: 577px) and (max-width: 768px) {
@@ -420,7 +421,8 @@
       <button class="mobile-copy-search-btn" onclick="copyAndSearchFelo()">搜</button>
       <button class="mobile-quick-btn" onclick="toggleQuickMode()">快</button>
       <div class="col-12">
-        <div id="question-container" class="question-block"></div>
+        <!-- 注意：question-container 內容會由 renderQuestion() 渲染，我們會在其內附加字體調整按鈕 -->
+        <div id="question-container" class="question-block" style="position: relative;"></div>
       </div>
     </div>
 
@@ -471,27 +473,27 @@
     let categories = [];
     let isMultipleChoice = false;
     let answered = false;
-
-    // 新增：快答模式控制變數
     let quickMode = false;
 
     document.getElementById('categoryFilter').addEventListener('change', applyFilters);
     document.getElementById('keywordFilter').addEventListener('input', applyFilters);
     document.getElementById('feloFilter').addEventListener('input', applyFilters);
 
+    // 修改 updateProgress()：存入原始題目的唯一識別碼（class+題號）
     function updateProgress() {
-      localStorage.setItem('reviewProgress', currentIndex);
+      if(filteredQuestions.length > 0){
+        const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
+        const progressData = { id: currentQuestion.class + '-' + formatSn(currentQuestion.sn) };
+        localStorage.setItem('reviewProgress', JSON.stringify(progressData));
+      }
     }
 
-    // 初始設置按鈕顯示狀態
     function updateCopySearchButtonVisibility() {
       const isMobile = window.innerWidth <= 576;
       document.getElementById('copy-search-button').style.display = isMobile ? 'none' : 'block';
     }
 
-    // 頁面載入時檢查
     window.addEventListener('load', updateCopySearchButtonVisibility);
-    // 窗口大小變化時檢查
     window.addEventListener('resize', updateCopySearchButtonVisibility);
 
     function loadFromGitHub() {
@@ -525,11 +527,21 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
+          // 修改：讀取進度時依據原始題目唯一識別碼來尋找該題
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
-            if (confirm(`發現上次複習進度為題號 ${parseInt(savedProgress, 10) + 1}，是否跳轉到該題？`)) {
-              currentIndex = parseInt(savedProgress, 10);
-              renderQuestion();
+            const progressData = JSON.parse(savedProgress);
+            const originalIndex = questions.findIndex(q => q.class + '-' + formatSn(q.sn) === progressData.id);
+            if (originalIndex !== -1) {
+              if (confirm(`發現上次複習進度為題目 ${progressData.id}，是否跳轉到該題？`)) {
+                const newIndex = filteredQuestions.findIndex(q => q.class + '-' + formatSn(q.sn) === progressData.id);
+                if (newIndex !== -1) {
+                  currentIndex = newIndex;
+                } else {
+                  alert('該題目前不在篩選結果中，無法跳轉。');
+                }
+                renderQuestion();
+              }
             }
           }
         })
@@ -572,11 +584,21 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
+          // 修改：讀取進度時依據原始題目唯一識別碼來尋找該題
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
-            if (confirm(`發現上次複習進度為題號 ${parseInt(savedProgress, 10) + 1}，是否跳轉到該題？`)) {
-              currentIndex = parseInt(savedProgress, 10);
-              renderQuestion();
+            const progressData = JSON.parse(savedProgress);
+            const originalIndex = questions.findIndex(q => q.class + '-' + formatSn(q.sn) === progressData.id);
+            if (originalIndex !== -1) {
+              if (confirm(`發現上次複習進度為題目 ${progressData.id}，是否跳轉到該題？`)) {
+                const newIndex = filteredQuestions.findIndex(q => q.class + '-' + formatSn(q.sn) === progressData.id);
+                if (newIndex !== -1) {
+                  currentIndex = newIndex;
+                } else {
+                  alert('該題目前不在篩選結果中，無法跳轉。');
+                }
+                renderQuestion();
+              }
             }
           }
         } catch (error) {
@@ -677,7 +699,6 @@
       if (!this.value.trim()) filterByFelo();
     });
 
-    // 修改 renderQuestion() 以根據 quickMode 狀態切換底部導航
     function renderQuestion() {
       const questionContainer = document.getElementById('question-container');
 
@@ -685,15 +706,12 @@
         questionContainer.innerHTML = '<p>沒有符合篩選條件的題目。</p>';
         questionContainer.style.display = 'block';
         document.getElementById('copy-search-button').style.display = 'none';
+        appendFontAdjuster();
         return;
       }
 
       const isMobile = window.innerWidth <= 576;
-      if (!isMobile) {
-        questionContainer.style.display = 'block';
-      } else if (filteredQuestions.length > 0) {
-        questionContainer.style.display = 'block';
-      }
+      questionContainer.style.display = 'block';
 
       const q = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
       document.getElementById('current-question').textContent = currentIndex + 1;
@@ -751,15 +769,47 @@
       document.getElementById('github-load-btn').style.display = 'none';
       document.getElementById('github-info-btn').style.display = 'none';
 
-      // 根據 quickMode 狀態切換底部導航
       if (quickMode) {
         renderQuickNavigation();
       } else {
         restoreFixedButtons();
       }
 
-      // 確保根據螢幕寬度控制按鈕顯示
       updateCopySearchButtonVisibility();
+      appendFontAdjuster();
+    }
+
+    // 每次題目渲染後，將字體調整按鈕附加在 question-container 內
+    function appendFontAdjuster() {
+      const questionContainer = document.getElementById('question-container');
+      if (!document.getElementById('font-adjuster')) {
+        const adjuster = document.createElement('div');
+        adjuster.id = 'font-adjuster';
+        adjuster.style.position = 'absolute';
+        adjuster.style.bottom = '5px';
+        adjuster.style.right = '5px';
+        adjuster.style.display = 'flex';
+        adjuster.style.gap = '5px';
+        adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
+                              '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
+        questionContainer.appendChild(adjuster);
+        document.getElementById('font-increase').addEventListener('click', function() {
+          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+          let newSize = currentSize + 1;
+          questionContainer.style.fontSize = newSize + "px";
+          localStorage.setItem('questionFontSize', newSize);
+        });
+        document.getElementById('font-decrease').addEventListener('click', function() {
+          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+          let newSize = currentSize - 1;
+          questionContainer.style.fontSize = newSize + "px";
+          localStorage.setItem('questionFontSize', newSize);
+        });
+      }
+      const savedFontSize = localStorage.getItem('questionFontSize');
+      if (savedFontSize) {
+        questionContainer.style.fontSize = savedFontSize + "px";
+      }
     }
 
     function formatSn(sn) {
@@ -896,8 +946,8 @@
         options.forEach(option => {
           if (option.dataset.answer === 'true') {
             option.classList.add('answer');
-            option.style.backgroundColor = '#fff3a6';
-            option.style.color =  '#343a40';
+            option.style.backgroundColor =  '#fff3a6';
+            option.style.color = '#343a40';
           } else {
             option.style.backgroundColor = 'white';
             option.style.color = 'black';
@@ -1116,8 +1166,8 @@
 
     function toggleMobileNotes() {
       const hidePicCheckbox = document.getElementById('hidePic');
-	  hidePicCheckbox.checked = !hidePicCheckbox.checked;
-	  togglePicVisibility();
+      hidePicCheckbox.checked = !hidePicCheckbox.checked;
+      togglePicVisibility();
     }
 
     function filterByQuestionType() {
@@ -1292,35 +1342,25 @@
       window.location.href = 'https://weichen5700.github.io/TLE/info.html';
     }
 
-    // =====================
-    // 快答模式相關功能：改為單行排列，按鈕高度與原本上一題/下一題相近
-    // =====================
-		 function toggleQuickMode() {
-		  quickMode = !quickMode;
-		  if (quickMode) {
-			// 啟用快答時，強制開啟遮住答案功能
-			document.getElementById('hideAnswers').checked = true;
-			toggleAnswerVisibility();
-			renderQuickNavigation();
-		  } else {
-			// 關閉快答時，取消遮住答案
-			document.getElementById('hideAnswers').checked = false;
-			toggleAnswerVisibility();
-			restoreFixedButtons();
-		  }
-		}
+    function toggleQuickMode() {
+      quickMode = !quickMode;
+      if (quickMode) {
+        document.getElementById('hideAnswers').checked = true;
+        toggleAnswerVisibility();
+        renderQuickNavigation();
+      } else {
+        document.getElementById('hideAnswers').checked = false;
+        toggleAnswerVisibility();
+        restoreFixedButtons();
+      }
+    }
 
-
-
-    // 根據當前題目的選項數量產生單行排列的按鈕
     function renderQuickNavigation() {
       const fixedButtonsDiv = document.querySelector('.fixed-buttons');
       const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
       const numOptions = currentQuestion.options.length;
       const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      // 定義一組顏色，若選項超過 4 顏色則循環使用
       let colors = ["#ff9999", "#99ff99", "#9999ff", "#ffcc99"];
-      // 使用 flex 排列，讓按鈕高度與原本固定按鈕相近
       let rowHTML = `<div style="display: flex; gap: 8px; justify-content: center; align-items: center; width: 100%;">`;
       for (let i = 0; i < numOptions; i++) {
         let color = colors[i % colors.length];
@@ -1334,7 +1374,6 @@
       fixedButtonsDiv.innerHTML = rowHTML;
     }
 
-    // 還原原本的上一題/下一題導航按鈕
     function restoreFixedButtons() {
       const fixedButtonsDiv = document.querySelector('.fixed-buttons');
       fixedButtonsDiv.innerHTML = `
@@ -1343,25 +1382,21 @@
       `;
     }
 
-    // 點選小按鈕後模擬答題動作
     function selectOption(optionIndex) {
-  const options = document.querySelectorAll('.option');
-  if (optionIndex < options.length) {
-    const optionElement = options[optionIndex];
-    const checkbox = optionElement.querySelector('.answer-checkbox');
-    if (checkbox) {
-      if (isMultipleChoice) {
-        // 複選題：只切換勾選狀態，不送出答案
-        checkbox.checked = !checkbox.checked;
-      } else {
-        // 單選題：自動勾選並送出答案
-        checkbox.checked = true;
-        checkAnswer(checkbox);
+      const options = document.querySelectorAll('.option');
+      if (optionIndex < options.length) {
+        const optionElement = options[optionIndex];
+        const checkbox = optionElement.querySelector('.answer-checkbox');
+        if (checkbox) {
+          if (isMultipleChoice) {
+            checkbox.checked = !checkbox.checked;
+          } else {
+            checkbox.checked = true;
+            checkAnswer(checkbox);
+          }
+        }
       }
     }
-  }
-}
-
   </script>
 </body>
 </html>
