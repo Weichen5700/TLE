@@ -638,16 +638,17 @@ function renderQuestion() {
         }
         const inputType = isMultipleChoice ? 'checkbox' : 'radio';
         return `
-            <div class="option" style="background-color: ${backgroundColor};">
-                <input type="${inputType}" id="option-${i}" name="single-choice-${currentQuestionIndex}" value="${opt.option}" ${isSelected ? 'checked' : ''} ${isReviewMode ? 'disabled' : ''} onclick="saveAnswer('${opt.option}', ${isMultipleChoice})">
-                <label for="option-${i}">${opt.option}</label>
+            <label class="option" style="background-color: ${backgroundColor}; display: block; cursor: pointer;" onclick="saveAnswer('${opt.option}', ${isMultipleChoice})">
+                <input type="${inputType}" id="option-${i}" name="single-choice-${currentQuestionIndex}" value="${opt.option}" ${isSelected ? 'checked' : ''} ${isReviewMode ? 'disabled' : ''} onclick="event.stopPropagation();">
+                ${opt.option}
                 ${isReviewMode && (isSelected || isCorrect) ? `<div style="font-size: 0.9rem; margin-top: 0.5rem;">${hintText}</div>` : ''}
-            </div>
+            </label>
         `;
     }).join('');
 
     document.getElementById('current-question').textContent = currentQuestionIndex + 1;
 }
+
 
 function saveAnswer(selectedOption, isMultipleChoice) {
     if (!isReviewMode) {
