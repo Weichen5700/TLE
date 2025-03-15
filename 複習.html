@@ -626,17 +626,18 @@
       );
     }
 
-    function populateCategoryFilter() {
-      const categoryFilter = document.getElementById('categoryFilter');
-      categoryFilter.innerHTML = '<option value="">全選</option>';
-      categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        const questionCount = questions.filter(q => q.class === category).length;
-        option.textContent = `${category} (${questionCount})`;
-        categoryFilter.appendChild(option);
-      });
-    }
+   function populateCategoryFilter() {
+  const categoryFilter = document.getElementById('categoryFilter');
+  categoryFilter.innerHTML = '<option value="">全選</option>';
+  categories.forEach((category, index) => {
+    const option = document.createElement('option');
+    option.value = category;
+    const questionCount = questions.filter(q => q.class === category).length;
+    // 在類別前加入編號（index+1）
+    option.textContent = `${index + 1}. ${category} (${questionCount})`;
+    categoryFilter.appendChild(option);
+  });
+}
 
     function filterByKeywords() {
       const input = document.getElementById('keywordFilter').value;
