@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-	  html {
-	  touch-action: manipulation;
-	}
+    html {
+      touch-action: manipulation;
+    }
     body {
       font-family: 'Noto Sans TC', sans-serif;
       background: linear-gradient(45deg, #dcedc8, #b2dfdb);
@@ -59,16 +59,15 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
-		 .option {
-		  display: block;
-		  /* 原有樣式保持不變 */
-		  background-color: white;
-		  color: black;
-		  padding: 0.75rem;
-		  margin-bottom: 0.5rem;
-		  border-radius: 0.3125rem;
-		  transition: background-color 0.3s, color 0.3s;
-		}
+    .option {
+      display: block;
+      background-color: white;
+      color: black;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.3125rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
     .options div:hover {
       background-color: #ffb74d;    
       transform-origin: top left;
@@ -425,7 +424,7 @@
       <button class="mobile-copy-search-btn" onclick="copyAndSearchFelo()">搜</button>
       <button class="mobile-quick-btn" onclick="toggleQuickMode()">快</button>
       <div class="col-12">
-        <!-- 注意：question-container 內容會由 renderQuestion() 渲染，我們會在其內附加字體調整按鈕 -->
+        <!-- 注意：question-container 內容會由 renderQuestion() 渲染 -->
         <div id="question-container" class="question-block" style="position: relative;"></div>
       </div>
     </div>
@@ -463,7 +462,9 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
   <script>
-    // 基本功能程式碼（讀取題目、過濾、切換等）
+    // ======================
+    // 主功能程式碼區段
+    // ======================
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
@@ -483,7 +484,6 @@
     document.getElementById('keywordFilter').addEventListener('input', applyFilters);
     document.getElementById('feloFilter').addEventListener('input', applyFilters);
 
-    // 修改 updateProgress()：存入原始題目的唯一識別碼（class+題號）
     function updateProgress() {
       if(filteredQuestions.length > 0){
         const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
@@ -531,7 +531,6 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
-          // 修改：讀取進度時依據原始題目唯一識別碼來尋找該題
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
             const progressData = JSON.parse(savedProgress);
@@ -554,6 +553,7 @@
           alert('無法從 GitHub 載入，請檢查 URL 或使用手動上傳。');
         });
     }
+    window.loadFromGitHub = loadFromGitHub; // 掛在全局以供 inline onclick 調用
 
     function readFile() {
       const fileInput = document.getElementById('fileInput');
@@ -588,7 +588,6 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
-          // 修改：讀取進度時依據原始題目唯一識別碼來尋找該題
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
             const progressData = JSON.parse(savedProgress);
@@ -783,7 +782,6 @@
       appendFontAdjuster();
     }
 
-    // 每次題目渲染後，將字體調整按鈕附加在 question-container 內
     function appendFontAdjuster() {
       const questionContainer = document.getElementById('question-container');
       if (!document.getElementById('font-adjuster')) {
@@ -977,7 +975,7 @@
         const isCorrect = optionElement.dataset.answer === 'true';
         if (checkbox.checked) {
           anySelected = true;
-          if (!isCorrect) allCorrect = false;		  
+          if (!isCorrect) allCorrect = false;		      
         }
         if (!checkbox.checked && isCorrect) allCorrect = false;
       });
@@ -986,9 +984,7 @@
         return;
       }
       checkboxes.forEach(checkbox => checkbox.disabled = true);
-	  // 高亮正確選項（包括設定黃底等效果）
-		highlightCorrectOptions();
-  
+      highlightCorrectOptions();
       showResult(allCorrect);
       const submitButton = document.getElementById('submit-button');
       if (submitButton) submitButton.remove();
@@ -998,31 +994,30 @@
     const correctSound = new Audio('correct_sound.mp3');
     const errorSound = new Audio('error_sound.mp3');
 
-   function showResult(isCorrect) {
-	  const resultMessage = document.createElement('div');
-	  resultMessage.classList.add('result-message');
-	  if (isCorrect) {
-		correctCount++;
-		resultMessage.textContent = '✔ 正確';
-		resultMessage.style.color = 'green';
-		resultMessage.style.backgroundColor = '#d4edda';
-		playCorrectSound();
-	  } else {
-		triggerWarning();
-		playErrorSound();
-		incorrectCount++;
-		resultMessage.textContent = '✖ 錯誤';
-		resultMessage.style.color = 'red';
-		resultMessage.style.backgroundColor = '#f8d7da';
-	  }
-	  
-	  // 送出答案後無論對錯，都高亮正確的選項
-	  highlightCorrectOptions();
+    function showResult(isCorrect) {
+      const resultMessage = document.createElement('div');
+      resultMessage.classList.add('result-message');
+      if (isCorrect) {
+        correctCount++;
+        resultMessage.textContent = '✔ 正確';
+        resultMessage.style.color = 'green';
+        resultMessage.style.backgroundColor = '#d4edda';
+        playCorrectSound();
+      } else {
+        triggerWarning();
+        playErrorSound();
+        incorrectCount++;
+        resultMessage.textContent = '✖ 錯誤';
+        resultMessage.style.color = 'red';
+        resultMessage.style.backgroundColor = '#f8d7da';
+      }
+      
+      highlightCorrectOptions();
 
-	  document.querySelector('.question-content').appendChild(resultMessage);
-	  setTimeout(() => resultMessage.remove(), 2000);
-	  updateAnswerCount();
-	}
+      document.querySelector('.question-content').appendChild(resultMessage);
+      setTimeout(() => resultMessage.remove(), 2000);
+      updateAnswerCount();
+    }
 
     function playCorrectSound() {
       correctSound.play();
@@ -1118,31 +1113,6 @@
         jumpToQuestion();
       }
     });
-
-    const questionContainer = document.getElementById('question-container');
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    questionContainer.addEventListener('touchstart', function(event) {
-      touchStartX = event.changedTouches[0].screenX;
-    });
-
-    questionContainer.addEventListener('touchend', function(event) {
-      touchEndX = event.changedTouches[0].screenX;
-      handleSwipe();
-    });
-
-    function handleSwipe() {
-      const swipeDistance = touchEndX - touchStartX;
-      const minSwipeDistance = 50;
-      if (window.innerWidth <= 576 && Math.abs(swipeDistance) > minSwipeDistance) {
-        if (swipeDistance > 0) {
-          prevQuestion();
-        } else if (swipeDistance < 0) {
-          nextQuestion();
-        }
-      }
-    }
 
     document.querySelectorAll('.fixed-buttons button, .jump-to button').forEach(button => {
       button.addEventListener('click', function(event) {
@@ -1391,20 +1361,16 @@
         <button class="btn btn-primary" onclick="nextQuestion()">下一題</button>
       `;
     }
-	function highlightCorrectOptions() {
-	  const options = document.querySelectorAll('.option');
-	  options.forEach(option => {
-		if (option.dataset.answer === 'true') {
-		  // 設定黃底與深色文字
-		  option.style.backgroundColor = '#fff3a6';
-		  option.style.color = '#343a40';
-		  // 如果你有需要也可以加上 .answer class
-		  option.classList.add('answer');
-		}
-	  });
-	}
-
-
+    function highlightCorrectOptions() {
+      const options = document.querySelectorAll('.option');
+      options.forEach(option => {
+        if (option.dataset.answer === 'true') {
+          option.style.backgroundColor = '#fff3a6';
+          option.style.color = '#343a40';
+          option.classList.add('answer');
+        }
+      });
+    }
 
     function selectOption(optionIndex) {
       const options = document.querySelectorAll('.option');
@@ -1421,6 +1387,43 @@
         }
       }
     }
+
+    // ================================
+    // 手機滑動優化程式碼區段
+    // ================================
+    // 擴大手機模式下的觸控範圍，若在手機（寬度<=576px）則綁定至 body，否則仍用 question-container
+    const swipeArea = window.innerWidth <= 576 ? document.body : document.getElementById('question-container');
+    let touchStartX = 0, touchEndX = 0;
+    let touchStartY = 0, touchEndY = 0;
+    const minSwipeDistance = 50;
+
+    swipeArea.addEventListener('touchstart', function(event) {
+      touchStartX = event.changedTouches[0].screenX;
+      touchStartY = event.changedTouches[0].screenY;
+    });
+
+    swipeArea.addEventListener('touchend', function(event) {
+      touchEndX = event.changedTouches[0].screenX;
+      touchEndY = event.changedTouches[0].screenY;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      // 若水平位移超過閾值，且至少為垂直位移的兩倍，則認定為左右滑動
+      if (Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaX) > 2 * Math.abs(deltaY)) {
+        if (deltaX > 0) {
+          prevQuestion();
+        } else {
+          nextQuestion();
+        }
+      } else if (Math.abs(deltaY) > minSwipeDistance) {
+        // 垂直滑動，可依需求在此處添加其他功能
+        console.log(deltaY > 0 ? '向下滑動' : '向上滑動');
+      }
+    }
+    // ================================
   </script>
 </body>
 </html>
