@@ -176,8 +176,8 @@
       }
       .option {
         padding: 0.5rem;
-        margin-bottom: 0.25rem;
-		font-size: 1.2rem; /* 統一字體 */
+		margin-bottom: 0.25rem;
+		font-size: 1.2em;  /* 改成 em 以便相對 #question-container 調整 */
       }
       .remark {
         padding: 0.5rem;
@@ -784,37 +784,43 @@
       appendFontAdjuster();
     }
 
-    function appendFontAdjuster() {
-      const questionContainer = document.getElementById('question-container');
-      if (!document.getElementById('font-adjuster')) {
-        const adjuster = document.createElement('div');
-        adjuster.id = 'font-adjuster';
-        adjuster.style.position = 'absolute';
-        adjuster.style.bottom = '5px';
-        adjuster.style.right = '5px';
-        adjuster.style.display = 'flex';
-        adjuster.style.gap = '5px';
-        adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
-                              '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
-        questionContainer.appendChild(adjuster);
-        document.getElementById('font-increase').addEventListener('click', function() {
-          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
-          let newSize = currentSize + 1;
-          questionContainer.style.fontSize = newSize + "px";
-          localStorage.setItem('questionFontSize', newSize);
-        });
-        document.getElementById('font-decrease').addEventListener('click', function() {
-          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
-          let newSize = currentSize - 1;
-          questionContainer.style.fontSize = newSize + "px";
-          localStorage.setItem('questionFontSize', newSize);
-        });
-      }
-      const savedFontSize = localStorage.getItem('questionFontSize');
-      if (savedFontSize) {
-        questionContainer.style.fontSize = savedFontSize + "px";
-      }
-    }
+			function appendFontAdjuster() {
+		  const questionContainer = document.getElementById('question-container');
+		  // 如果按鈕尚未建立，就創建並添加到 questionContainer 內
+		  if (!document.getElementById('font-adjuster')) {
+			const adjuster = document.createElement('div');
+			adjuster.id = 'font-adjuster';
+			// 用 fixed 位置改成 absolute，確保它貼在 questionContainer 右下角
+			adjuster.style.position = 'absolute';
+			adjuster.style.bottom = '5px';
+			adjuster.style.right = '5px';
+			adjuster.style.display = 'flex';
+			adjuster.style.gap = '5px';
+			adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
+								 '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
+			questionContainer.appendChild(adjuster);
+			
+			document.getElementById('font-increase').addEventListener('click', function() {
+			  let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+			  let newSize = currentSize + 1;
+			  questionContainer.style.fontSize = newSize + "px";
+			  localStorage.setItem('questionFontSize', newSize);
+			});
+			document.getElementById('font-decrease').addEventListener('click', function() {
+			  let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+			  let newSize = currentSize - 1;
+			  questionContainer.style.fontSize = newSize + "px";
+			  localStorage.setItem('questionFontSize', newSize);
+			});
+		  }
+		  // 每次渲染時，都從 localStorage 中讀取最新的 font-size
+		  const savedFontSize = localStorage.getItem('questionFontSize');
+		  if (savedFontSize) {
+			questionContainer.style.fontSize = savedFontSize + "px";
+		  }
+		}
+
+
 
     function formatSn(sn) {
       return sn.toString().padStart(3, '0');
