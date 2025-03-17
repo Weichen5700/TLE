@@ -174,7 +174,7 @@
         padding: 0.75rem;
         min-height: 60vh;
         max-height: 80vh;
-        padding-bottom: 4rem;
+        padding-bottom: 4rem !important;
         display: none;
       }
       .option {
@@ -866,8 +866,8 @@
         const adjuster = document.createElement('div');
         adjuster.id = 'font-adjuster';
         adjuster.style.position = 'absolute';
-        adjuster.style.bottom = '5px';
-        adjuster.style.right = '5px';
+        adjuster.style.top = '5px';    // 從底部改到頂部
+		adjuster.style.right = '5px';
         adjuster.style.display = 'flex';
         adjuster.style.gap = '5px';
         adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
