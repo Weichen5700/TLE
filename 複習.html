@@ -7,9 +7,10 @@
   <title>114年TLE考題複習</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
     html {
-      touch-action: manipulation;
+      touch-action: manipulation;	  
     }
     body {
       font-family: 'Noto Sans TC', sans-serif;
@@ -19,7 +20,7 @@
       margin: 0;
       padding: 1.5rem;
       min-height: 100vh;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       line-height: 1.6;
       letter-spacing: 0.02em;
     }
@@ -51,7 +52,7 @@
       animation: fadeIn 1.5s ease;
     }
     .question-content h3 {
-      font-size: 1.4em;
+      font-size: 1.6em;
       margin-bottom: 1rem;
       color: #4a90e2;
     }
@@ -60,7 +61,6 @@
       to { opacity: 1; }
     }
     .option {
-	  font-size: 1.2em;
       display: block;
       background-color: white;
       color: black;
@@ -70,7 +70,7 @@
       transition: background-color 0.3s, color 0.3s;
     }
     .options div:hover {
-      background-color: #ffb74d;    
+      background-color: #ffb74d;
       transform-origin: top left;
       box-shadow: 0 0.5rem 1rem rgba(255, 183, 77, 0.4);
     }
@@ -143,7 +143,6 @@
     .question-class {
       color: #9b59b6;
     }
-    /* 手機版左上角按鈕 */
     .mobile-note-btn, .mobile-copy-search-btn, .mobile-quick-btn {
       display: none;
       position: fixed;
@@ -163,21 +162,24 @@
     .mobile-copy-search-btn { left: 35px; }
     .mobile-quick-btn { left: 70px; }
     @media (max-width: 576px) {
+	 .difficulty-stars {
+		padding: 2px; /* 手機版減少間距 */
+	  }
+  
       body {
         padding: 0.75rem;
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
       .question-block {
         padding: 0.75rem;
         min-height: 60vh;
         max-height: 80vh;
-        padding-bottom: 2rem;
+        padding-bottom: 4rem;
         display: none;
       }
       .option {
         padding: 0.5rem;
-		margin-bottom: 0.25rem;
-		font-size: 1.2em;  /* 改成 em 以便相對 #question-container 調整 */
+        margin-bottom: 0.25rem;
       }
       .remark {
         padding: 0.5rem;
@@ -275,7 +277,7 @@
         overflow-y: auto;
       }
       .question-content h3 {
-        font-size: 1.4em;
+        font-size: 1.2em;
       }
       .note-btn {
         display: none;
@@ -291,10 +293,23 @@
       #copy-search-button {
         display: none !important;
       }
+	  .answer-count-container {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 0.5rem;
+	  }
+	  #difficulty-stars-container {
+		margin: 0 0.5rem;
+	  }
+	  #correct-count, #incorrect-count {
+		font-size: 1.2rem;
+	  }
+  
     }
     @media (min-width: 577px) and (max-width: 768px) {
       body {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
       }
       .question-block {
         padding: 1.25rem;
@@ -319,6 +334,10 @@
       background: linear-gradient(45deg, #2d3436, #636e72);
       color: #dfe6e9;
     }
+	body.dark-mode .difficulty-stars {
+	background: transparent;
+	}
+
     .dark-mode .question-block {
       background-color: #2d3436;
       color: #dfe6e9;
@@ -334,6 +353,15 @@
     .dark-mode .fixed-buttons {
       background-color: #2d3436;
     }
+	.difficulty-stars {
+	  /* 移除背景顏色和邊框，保持透明 */
+	  background: transparent;
+	  padding: 5px;
+	  border-radius: 0; /* 移除圓角 */
+	  display: inline-flex; /* 確保星星水平排列 */
+	  align-items: center;
+	}
+
   </style>
 </head>
 <body>
@@ -347,9 +375,12 @@
           <span class="custom-toggler-icon"></span>
         </button>
         <button class="btn btn-secondary d-none d-md-inline-block float-end" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
-          顯示/隱藏設定
+          功能選單
         </button>
-        <button class="btn btn-dark float-end ms-2" onclick="toggleDarkMode()">夜間模式</button>
+       <button id="darkModeBtn" class="btn btn-dark float-end ms-2" onclick="toggleDarkMode()">
+		<i id="darkModeIcon" class="bi bi-moon-fill"></i>
+		</button>
+        <button class="btn btn-info float-end ms-2" onclick="toggleMemoryMode()">標註</button>
       </div>
     </div>
 
@@ -378,7 +409,7 @@
         </div>
         <div class="form-check mb-2">
           <input class="form-check-input" type="checkbox" id="hideFelo" onchange="toggleFeloVisibility()" checked>
-          <label class="form-check-label" for="hideFelo">5. 隱藏Felo</label>
+          <label class="form-check-label" for="hideFelo">5. 隱藏筆記</label>
         </div>
         <div class="form-check mb-2">
           <input class="form-check-input" type="checkbox" id="hidePic" onchange="togglePicVisibility()" checked>
@@ -395,7 +426,7 @@
           <input type="text" id="keywordFilter" class="form-control" placeholder="使用「+」代表AND，用「,」或「，」代表OR，用「!」或「-」代表NOT" oninput="filterByKeywords()">
         </div>
         <div class="mb-2">
-          <label for="feloFilter">9. 過濾Felo：</label>
+          <label for="feloFilter">9. 過濾筆記：</label>
           <input type="text" id="feloFilter" class="form-control" placeholder="使用「+」代表AND，用「,」或「，」代表OR，用「!」或「-」代表NOT" oninput="filterByFelo()">
         </div>
         <div class="mb-2">
@@ -405,20 +436,32 @@
             <option value="單選題">單選題</option>
             <option value="複選題">複選題</option>
           </select>
-        </div>
-        <div class="mb-2">
-          <label>11. 修改筆記並匯出</label>
-          <button class="btn btn-secondary mt-3" onclick="exportModifiedQuestions()">匯出修改後檔案</button>
-        </div>
+        </div>			
+		  <!-- 前面的 0~10 項保持不變 -->
+				<div class="mb-2">
+			  <label for="starFilter">11. 過濾星數：</label>
+			  <select id="starFilter" class="form-select" onchange="applyFilters()">
+				<option value="no-filter" selected>不篩選</option>
+				<option value="">全部</option>
+				<option value="1">1 顆星</option>
+				<option value="2">2 顆星</option>
+				<option value="3">3 顆星</option>
+			  </select>
+			</div>
+		  <div class="mb-2">
+			<label>12. 修改筆記並匯出</label>
+			<button class="btn btn-secondary mt-3" onclick="exportModifiedQuestions()">匯出修改後檔案</button>		
+		</div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12 answer-count-container">
-        <span id="correct-count" style="color: green; font-size: 1.5rem;">答對: 0</span>
-        <span id="incorrect-count" style="color: red; font-size: 1.5rem;">答錯: 0</span>
-      </div>
-    </div>
+	 <div class="row">
+	  <div class="col-12 answer-count-container">
+		<span id="correct-count" style="color: green; font-size: 1.5rem;">答對: 0</span>
+		<div id="difficulty-stars-container" style="display: inline-block; vertical-align: middle;"></div>
+		<span id="incorrect-count" style="color: red; font-size: 1.5rem;">答錯: 0</span>
+	  </div>
+	</div>
 
     <div class="row position-relative">
       <!-- 手機版按鈕：註、搜、快 -->
@@ -464,13 +507,23 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ======================
-    // 主功能程式碼區段
-    // ======================
+    // 基本功能程式碼（讀取題目、過濾、切換等）
     function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
+		  document.body.classList.toggle('dark-mode');
+		  const darkModeIcon = document.getElementById('darkModeIcon');
+		  if (document.body.classList.contains('dark-mode')) {
+			// 若進入暗黑模式，顯示「太陽」圖示，提示可切回亮模式
+			darkModeIcon.classList.remove('bi-moon-fill');
+			darkModeIcon.classList.add('bi-sun-fill');
+		  } else {
+			// 若處於亮模式，顯示「月亮」圖示，提示可切換到暗黑模式
+			darkModeIcon.classList.remove('bi-sun-fill');
+			darkModeIcon.classList.add('bi-moon-fill');
+		  }
+		}
 
+
+    let memoryMode = false;
     let questions = [];
     let filteredQuestions = [];
     let currentIndex = 0;
@@ -481,11 +534,15 @@
     let isMultipleChoice = false;
     let answered = false;
     let quickMode = false;
+    window.currentQuestion = null; // 儲存目前題目資訊
 
     document.getElementById('categoryFilter').addEventListener('change', applyFilters);
-    document.getElementById('keywordFilter').addEventListener('input', applyFilters);
-    document.getElementById('feloFilter').addEventListener('input', applyFilters);
+	document.getElementById('keywordFilter').addEventListener('input', applyFilters);
+	document.getElementById('feloFilter').addEventListener('input', applyFilters);
+	document.getElementById('questionTypeFilter').addEventListener('change', applyFilters);
+	document.getElementById('starFilter').addEventListener('change', applyFilters);
 
+    // 修改 updateProgress()：存入原始題目唯一識別碼（class+題號）
     function updateProgress() {
       if(filteredQuestions.length > 0){
         const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
@@ -533,6 +590,7 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
+          // 讀取進度：依據題目唯一識別碼跳轉
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
             const progressData = JSON.parse(savedProgress);
@@ -555,7 +613,7 @@
           alert('無法從 GitHub 載入，請檢查 URL 或使用手動上傳。');
         });
     }
-    window.loadFromGitHub = loadFromGitHub; // 掛在全局以供 inline onclick 調用
+    window.loadFromGitHub = loadFromGitHub;
 
     function readFile() {
       const fileInput = document.getElementById('fileInput');
@@ -590,6 +648,7 @@
             document.getElementById('hideAnswers').checked = (storedHideAnswers === 'true');
             toggleAnswerVisibility();
           }
+          // 讀取進度
           const savedProgress = localStorage.getItem('reviewProgress');
           if (savedProgress !== null) {
             const progressData = JSON.parse(savedProgress);
@@ -626,19 +685,18 @@
       );
     }
 
-   function populateCategoryFilter() {
-  const categoryFilter = document.getElementById('categoryFilter');
-  categoryFilter.innerHTML = '<option value="">全選</option>';
-  categories.forEach((category, index) => {
-    const option = document.createElement('option');
-    option.value = category;
-    const questionCount = questions.filter(q => q.class === category).length;
-    // 在類別前加入編號（index+1）
-    option.textContent = `${index + 1}. ${category} (${questionCount})`;
-    categoryFilter.appendChild(option);
-  });
-}
-
+    function populateCategoryFilter() {
+      const categoryFilter = document.getElementById('categoryFilter');
+      categoryFilter.innerHTML = '<option value="">全選</option>';
+      categories.forEach((category, index) => {
+        const option = document.createElement('option');
+        option.value = category;
+        const questionCount = questions.filter(q => q.class === category).length;
+        option.textContent = `${index + 1}. ${category} (${questionCount})`;
+        categoryFilter.appendChild(option);
+      });
+    }
+    
     function filterByKeywords() {
       const input = document.getElementById('keywordFilter').value;
       if (!input.trim()) {
@@ -705,123 +763,133 @@
       if (!this.value.trim()) filterByFelo();
     });
 
-    function renderQuestion() {
-      const questionContainer = document.getElementById('question-container');
-
-      if (filteredQuestions.length === 0) {
-        questionContainer.innerHTML = '<p>沒有符合篩選條件的題目。</p>';
-        questionContainer.style.display = 'block';
-        document.getElementById('copy-search-button').style.display = 'none';
-        appendFontAdjuster();
-        return;
-      }
-
-      const isMobile = window.innerWidth <= 576;
-      questionContainer.style.display = 'block';
-
-      const q = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
-      document.getElementById('current-question').textContent = currentIndex + 1;
-      document.getElementById('total-questions').textContent = filteredQuestions.length;
-
-      let options = [...q.options];
-      if (document.getElementById('shuffleOptions').checked) {
-        options = shuffleOptions(options);
-      }
-
-      isMultipleChoice = options.filter(opt => opt.answer === true).length > 1;
-      let html = `
-        <div class="question-content" style="position: relative;">
-          <h3>題目 ${q.sn}: <span class="question-class">[${q.class}]</span> ${q.question}</h3>
-          <div class="options">
-          ${options.map((opt, i) => 
-			  `<label class="option" data-answer="${opt.answer}" data-text="選項 ${i + 1}: ${opt.option}" for="option-${i}">
-				<input type="checkbox" class="answer-checkbox" id="option-${i}">
-				選項 ${i + 1}: ${opt.option}
-			  </label>`
-			).join('')}
-          </div>
-          <div class="remark" style="display: block;">備註: ${q.remark || '無'}</div>
-          <div class="felo" style="display: block;">Felo: ${q.felo || '無'}</div>
-          <div class="pic" style="display: block;">${renderPics(q.pic)}</div>
-          <button class="btn btn-info btn-sm mt-2 note-btn" onclick="toggleNoteSection('${q.class}', '${formatSn(q.sn)}')">註記</button>
-          <div id="note-section-${q.class}-${formatSn(q.sn)}" class="note-section" style="display: none; margin-top: 0.625rem;">
-            <textarea class="form-control" id="note-input-${q.class}-${formatSn(q.sn)}" rows="3" placeholder="輸入筆記...">${q.felo || ''}</textarea>
-            <div class="mt-2">
-              <button class="btn btn-outline-primary btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '簡單')">簡單</button>
-              <button class="btn btn-outline-warning btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '中等')">中等</button>
-              <button class="btn btn-outline-danger btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '困難')">困難</button>
-              <button class="btn btn-success btn-sm" onclick="saveNote('${q.class}', '${formatSn(q.sn)}')">保存</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      questionContainer.innerHTML = html;
-
-      if (isMultipleChoice) {
-        const submitButton = document.createElement('button');
-        submitButton.id = 'submit-button';
-        submitButton.classList.add('btn', 'btn-primary');
-        submitButton.textContent = '送出答案';
-        submitButton.onclick = checkMultipleChoice;
-        questionContainer.appendChild(submitButton);
-      }
-
-      toggleAnswerVisibility();
-      toggleRemarkVisibility();
-      toggleFeloVisibility();
-      togglePicVisibility();
-
-      document.getElementById('github-load-btn').style.display = 'none';
-      document.getElementById('github-info-btn').style.display = 'none';
-
-      if (quickMode) {
-        renderQuickNavigation();
-      } else {
-        restoreFixedButtons();
-      }
-
-      updateCopySearchButtonVisibility();
-      appendFontAdjuster();
-    }
-
-			function appendFontAdjuster() {
+		 function renderQuestion() {
 		  const questionContainer = document.getElementById('question-container');
-		  // 如果按鈕尚未建立，就創建並添加到 questionContainer 內
-		  if (!document.getElementById('font-adjuster')) {
-			const adjuster = document.createElement('div');
-			adjuster.id = 'font-adjuster';
-			// 用 fixed 位置改成 absolute，確保它貼在 questionContainer 右下角
-			adjuster.style.position = 'absolute';
-			adjuster.style.bottom = '5px';
-			adjuster.style.right = '5px';
-			adjuster.style.display = 'flex';
-			adjuster.style.gap = '5px';
-			adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
-								 '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
-			questionContainer.appendChild(adjuster);
-			
-			document.getElementById('font-increase').addEventListener('click', function() {
-			  let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
-			  let newSize = currentSize + 1;
-			  questionContainer.style.fontSize = newSize + "px";
-			  localStorage.setItem('questionFontSize', newSize);
-			});
-			document.getElementById('font-decrease').addEventListener('click', function() {
-			  let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
-			  let newSize = currentSize - 1;
-			  questionContainer.style.fontSize = newSize + "px";
-			  localStorage.setItem('questionFontSize', newSize);
-			});
+		  if (filteredQuestions.length === 0) {
+			questionContainer.innerHTML = '<p>沒有符合篩選條件的題目。</p>';
+			questionContainer.style.display = 'block';
+			document.getElementById('copy-search-button').style.display = 'none';
+			appendFontAdjuster();
+			return;
 		  }
-		  // 每次渲染時，都從 localStorage 中讀取最新的 font-size
-		  const savedFontSize = localStorage.getItem('questionFontSize');
-		  if (savedFontSize) {
-			questionContainer.style.fontSize = savedFontSize + "px";
+
+		  const isMobile = window.innerWidth <= 576;
+		  questionContainer.style.display = 'block';
+
+		  const q = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
+		  window.currentQuestion = q;
+		  document.getElementById('current-question').textContent = currentIndex + 1;
+		  document.getElementById('total-questions').textContent = filteredQuestions.length;
+
+		  let options = [...q.options];
+		  if (document.getElementById('shuffleOptions').checked) {
+			options = shuffleOptions(options);
 		  }
+
+		  isMultipleChoice = options.filter(opt => opt.answer === true).length > 1;
+
+		  let html = `
+			<div class="question-content" style="position: relative;">
+			  <h3>題目 ${q.sn}: <span class="question-class">[${q.class}]</span> ${q.question}</h3>
+			  <div class="options">
+			   ${options.map((opt, i) => 
+				`<label class="option" data-answer="${opt.answer}" data-text="選項 ${i + 1}: ${opt.option}" for="option-${i}">
+				  <input type="checkbox" class="answer-checkbox" id="option-${i}">
+				  選項 ${i + 1}: ${opt.option}
+				</label>`
+			   ).join('')}
+			  </div>
+			  <div class="remark" style="display: block;">備註: ${q.remark || '無'}</div>
+			  <div class="felo" style="display: block;">筆記: ${q.felo || '無'}</div>
+			  <div class="pic" style="display: block;">${renderPics(q.pic)}</div>
+			  <button class="btn btn-info btn-sm mt-2 note-btn" onclick="toggleNoteSection('${q.class}', '${formatSn(q.sn)}')">註記</button>
+			  <div id="note-section-${q.class}-${formatSn(q.sn)}" class="note-section" style="display: none; margin-top: 0.625rem;">
+				<textarea class="form-control" id="note-input-${q.class}-${formatSn(q.sn)}" rows="3" placeholder="輸入筆記...">${q.felo || ''}</textarea>
+				<div class="mt-2">
+				  <button class="btn btn-outline-primary btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '簡單')">簡單</button>
+				  <button class="btn btn-outline-warning btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '中等')">中等</button>
+				  <button class="btn btn-outline-danger btn-sm" onclick="markDifficulty('${q.class}', '${formatSn(q.sn)}', '困難')">困難</button>
+				  <button class="btn btn-success btn-sm" onclick="saveNote('${q.class}', '${formatSn(q.sn)}')">保存</button>
+				</div>
+			  </div>
+			</div>
+		  `;
+
+		  questionContainer.innerHTML = html;
+
+		  if (isMultipleChoice) {
+			const submitButton = document.createElement('button');
+			submitButton.id = 'submit-button';
+			submitButton.classList.add('btn', 'btn-primary');
+			submitButton.textContent = '送出答案';
+			submitButton.onclick = checkMultipleChoice;
+			questionContainer.appendChild(submitButton);
+		  }
+
+		  toggleAnswerVisibility();
+		  toggleRemarkVisibility();
+		  toggleFeloVisibility();
+		  togglePicVisibility();
+
+		  // 根據星數篩選條件決定是否顯示星星
+		  const selectedStars = document.getElementById('starFilter').value;
+		  if (selectedStars === "" || (selectedStars >= "1" && selectedStars <= "3")) {
+			// 當選擇「全部」或「1~3 顆星」時，強制顯示星星
+			renderDifficultyStars(q.class, formatSn(q.sn));
+		  } else if (selectedStars === "no-filter") {
+			// 當選擇「不篩選星星」時，只有題目已有評分時顯示星星
+			const key = `difficulty_${q.class}_${formatSn(q.sn)}`;
+			const rating = parseInt(localStorage.getItem(key)) || 0;
+			if (rating > 0) {
+			  renderDifficultyStars(q.class, formatSn(q.sn));
+			} else {
+			  const starsContainer = document.getElementById('difficulty-stars-container');
+			  if (starsContainer) starsContainer.innerHTML = '';
+			}
+		  }
+
+		  if (quickMode) {
+			renderQuickNavigation(answered);
+		  } else {
+			restoreFixedButtons();
+		  }
+
+		  updateCopySearchButtonVisibility();
+		  appendFontAdjuster();
 		}
 
-
+    // 每次題目渲染後，附加字體調整按鈕
+    function appendFontAdjuster() {
+      const questionContainer = document.getElementById('question-container');
+      if (!document.getElementById('font-adjuster')) {
+        const adjuster = document.createElement('div');
+        adjuster.id = 'font-adjuster';
+        adjuster.style.position = 'absolute';
+        adjuster.style.bottom = '5px';
+        adjuster.style.right = '5px';
+        adjuster.style.display = 'flex';
+        adjuster.style.gap = '5px';
+        adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
+                              '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
+        questionContainer.appendChild(adjuster);
+        document.getElementById('font-increase').addEventListener('click', function() {
+          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+          let newSize = currentSize + 1;
+          questionContainer.style.fontSize = newSize + "px";
+          localStorage.setItem('questionFontSize', newSize);
+        });
+        document.getElementById('font-decrease').addEventListener('click', function() {
+          let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
+          let newSize = currentSize - 1;
+          questionContainer.style.fontSize = newSize + "px";
+          localStorage.setItem('questionFontSize', newSize);
+        });
+      }
+      const savedFontSize = localStorage.getItem('questionFontSize');
+      if (savedFontSize) {
+        questionContainer.style.fontSize = savedFontSize + "px";
+      }
+    }
 
     function formatSn(sn) {
       return sn.toString().padStart(3, '0');
@@ -971,7 +1039,7 @@
       const allCheckboxes = document.querySelectorAll('.answer-checkbox');
       allCheckboxes.forEach(cb => cb.disabled = true);
       const optionElement = checkbox.closest('.option');
-      const isCorrect = optionElement.dataset.answer === 'true';		
+      const isCorrect = optionElement.dataset.answer === 'true';
       showResult(isCorrect);
     }
 
@@ -984,7 +1052,7 @@
         const isCorrect = optionElement.dataset.answer === 'true';
         if (checkbox.checked) {
           anySelected = true;
-          if (!isCorrect) allCorrect = false;		      
+          if (!isCorrect) allCorrect = false;
         }
         if (!checkbox.checked && isCorrect) allCorrect = false;
       });
@@ -1003,30 +1071,36 @@
     const correctSound = new Audio('correct_sound.mp3');
     const errorSound = new Audio('error_sound.mp3');
 
-    function showResult(isCorrect) {
-      const resultMessage = document.createElement('div');
-      resultMessage.classList.add('result-message');
-      if (isCorrect) {
-        correctCount++;
-        resultMessage.textContent = '✔ 正確';
-        resultMessage.style.color = 'green';
-        resultMessage.style.backgroundColor = '#d4edda';
-        playCorrectSound();
-      } else {
-        triggerWarning();
-        playErrorSound();
-        incorrectCount++;
-        resultMessage.textContent = '✖ 錯誤';
-        resultMessage.style.color = 'red';
-        resultMessage.style.backgroundColor = '#f8d7da';
-      }
-      
-      highlightCorrectOptions();
+   function showResult(isCorrect) {
+	  const resultMessage = document.createElement('div');
+	  resultMessage.classList.add('result-message');
+	  if (isCorrect) {
+		correctCount++;
+		resultMessage.textContent = '✔ 正確';
+		resultMessage.style.color = 'green';
+		resultMessage.style.backgroundColor = '#d4edda';
+		playCorrectSound();
+	  } else {
+		triggerWarning();
+		playErrorSound();
+		incorrectCount++;
+		resultMessage.textContent = '✖ 錯誤';
+		resultMessage.style.color = 'red';
+		resultMessage.style.backgroundColor = '#f8d7da';
+		if (memoryMode && window.currentQuestion) {
+		  autoIncreaseDifficulty(window.currentQuestion.class, formatSn(window.currentQuestion.sn));
+		}
+	  }
+	  highlightCorrectOptions();
+	  document.querySelector('.question-content').appendChild(resultMessage);
+	  setTimeout(() => resultMessage.remove(), 2000);
+	  updateAnswerCount();
 
-      document.querySelector('.question-content').appendChild(resultMessage);
-      setTimeout(() => resultMessage.remove(), 2000);
-      updateAnswerCount();
-    }
+	  // 若在快速模式下，禁用按鈕
+	  if (quickMode) {
+		renderQuickNavigation(true); // 傳入 true 以禁用按鈕
+	  }
+	}
 
     function playCorrectSound() {
       correctSound.play();
@@ -1062,29 +1136,29 @@
       return urls.map(url => `<img src="${url}" alt="Image">`).join('');
     }
 
-    function prevQuestion() {
-      if (filteredQuestions.length === 0) return;
-      if (currentIndex > 0) {
-        currentIndex--;
-        answered = false;
-        renderQuestion();
-        updateProgress();
-      } else {
-        alert('已經是第一題了');
-      }
-    }
+   function prevQuestion() {
+	  if (filteredQuestions.length === 0) return;
+	  if (currentIndex > 0) {
+		currentIndex--;
+		answered = false; // 重置答題狀態
+		renderQuestion();
+		updateProgress();
+	  } else {
+		alert('已經是第一題了');
+	  }
+	}
 
-    function nextQuestion() {
-      if (filteredQuestions.length === 0) return;
-      if (currentIndex < filteredQuestions.length - 1) {
-        currentIndex++;
-        answered = false;
-        renderQuestion();
-        updateProgress();
-      } else {
-        alert('已經是最後一題了');
-      }
-    }
+   function nextQuestion() {
+	  if (filteredQuestions.length === 0) return;
+	  if (currentIndex < filteredQuestions.length - 1) {
+		currentIndex++;
+		answered = false; // 重置答題狀態
+		renderQuestion();
+		updateProgress();
+	  } else {
+		alert('已經是最後一題了');
+	  }
+	}
 
     function jumpToQuestion() {
       const input = document.getElementById('jump-input');
@@ -1099,21 +1173,12 @@
     }
 
     document.addEventListener('keydown', function(event) {
-      switch (event.key) {
-        case 'PageUp':
-        case 'ArrowUp':
-        case 'ArrowLeft':
-          event.preventDefault();
-          prevQuestion();
-          break;
-        case 'PageDown':
-        case 'ArrowDown':
-        case 'ArrowRight':
-          event.preventDefault();
-          nextQuestion();
-          break;
-        default:
-          break;
+      if (event.key === 'PageUp' || event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        prevQuestion();
+      } else if (event.key === 'PageDown' || event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        nextQuestion();
       }
     });
 
@@ -1290,42 +1355,133 @@
       return [...otherOptions, ...fixedOptions];
     }
 
-    function applyFilters() {
-      const selectedCategory = document.getElementById('categoryFilter').value;
-      const keywordInput = document.getElementById('keywordFilter').value.trim();
-      const feloInput = document.getElementById('feloFilter').value.trim();
-      filteredQuestions = selectedCategory
-        ? questions.filter(q => q.class === selectedCategory)
-        : [...questions];
-      if (keywordInput) {
-        const keywordGroups = parseFilterInput(keywordInput);
-        filteredQuestions = filteredQuestions.filter(q =>
-          keywordGroups.every(group =>
-            group.some(({ type, keyword }) =>
-              type === 'INCLUDE'
-                ? q.question.includes(keyword)
-                : !q.question.includes(keyword)
-            )
-          )
-        );
-      }
-      if (feloInput) {
-        const feloKeywordGroups = parseFilterInput(feloInput);
-        filteredQuestions = filteredQuestions.filter(q =>
-          feloKeywordGroups.every(group =>
-            group.some(({ type, keyword }) =>
-              q.felo && (type === 'INCLUDE'
-                ? q.felo.includes(keyword)
-                : !q.felo.includes(keyword))
-            )
-          )
-        );
-      }
-      resetRandomIndices();
-      currentIndex = 0;
-      document.getElementById('total-questions').textContent = filteredQuestions.length;
-      renderQuestion();
-    }
+    function applyAllFilters() {
+  // 從完整題目清單開始
+  let filtered = [...questions];
+
+  // 讀取各個過濾條件的值
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  const keywordInput = document.getElementById('keywordFilter').value.trim();
+  const feloInput = document.getElementById('feloFilter').value.trim();
+  const selectedQuestionType = document.getElementById('questionTypeFilter').value;
+
+  // 過濾類別（7. 過濾類別）
+  if (selectedCategory) {
+    filtered = filtered.filter(q => q.class === selectedCategory);
+  }
+
+  // 過濾題目內容（8. 過濾題目）
+  if (keywordInput) {
+    const keywordGroups = parseFilterInput(keywordInput);
+    filtered = filtered.filter(q =>
+      keywordGroups.every(group =>
+        group.some(({ type, keyword }) =>
+          type === 'INCLUDE'
+            ? q.question.includes(keyword)
+            : !q.question.includes(keyword)
+        )
+      )
+    );
+  }
+
+  // 過濾Felo（9. 過濾Felo）
+  if (feloInput) {
+    const feloKeywordGroups = parseFilterInput(feloInput);
+    filtered = filtered.filter(q =>
+      feloKeywordGroups.every(group =>
+        group.some(({ type, keyword }) =>
+          q.felo && (type === 'INCLUDE' ? q.felo.includes(keyword) : !q.felo.includes(keyword))
+        )
+      )
+    );
+  }
+
+		  // 過濾題型（10. 題型篩選）
+		  if (selectedQuestionType) {
+			if (selectedQuestionType === "單選題") {
+			  filtered = filtered.filter(q => q.options.filter(opt => opt.answer === true).length === 1);
+			} else if (selectedQuestionType === "複選題") {
+			  filtered = filtered.filter(q => q.options.filter(opt => opt.answer === true).length > 1);
+			}
+		  }
+
+		  return filtered;
+		}
+
+	function applyFilters() {
+		  let filtered = [...questions];
+
+		  const selectedCategory = document.getElementById('categoryFilter').value;
+		  const keywordInput = document.getElementById('keywordFilter').value.trim();
+		  const feloInput = document.getElementById('feloFilter').value.trim();
+		  const selectedQuestionType = document.getElementById('questionTypeFilter').value;
+		  const selectedStars = document.getElementById('starFilter').value;
+
+		  // 7. 過濾類別
+		  if (selectedCategory) {
+			filtered = filtered.filter(q => q.class === selectedCategory);
+		  }
+
+		  // 8. 過濾題目關鍵字
+		  if (keywordInput) {
+			const keywordGroups = parseFilterInput(keywordInput);
+			filtered = filtered.filter(q =>
+			  keywordGroups.every(group =>
+				group.some(({ type, keyword }) =>
+				  type === 'INCLUDE' ? q.question.includes(keyword) : !q.question.includes(keyword)
+				)
+			  )
+			);
+		  }
+
+		  // 9. 過濾筆記關鍵字
+		  if (feloInput) {
+			const feloKeywordGroups = parseFilterInput(feloInput);
+			filtered = filtered.filter(q =>
+			  feloKeywordGroups.every(group =>
+				group.some(({ type, keyword }) =>
+				  q.felo && (type === 'INCLUDE' ? q.felo.includes(keyword) : !q.felo.includes(keyword))
+				)
+			  )
+			);
+		  }
+
+		  // 10. 過濾題型
+		  if (selectedQuestionType) {
+			if (selectedQuestionType === "單選題") {
+			  filtered = filtered.filter(q => q.options.filter(opt => opt.answer === true).length === 1);
+			} else if (selectedQuestionType === "複選題") {
+			  filtered = filtered.filter(q => q.options.filter(opt => opt.answer === true).length > 1);
+			}
+		  }
+
+		  // 11. 過濾星數
+		  if (selectedStars !== "no-filter") { // 只有選擇「不篩選星星」時才不過濾
+			if (selectedStars === "") {
+			  // 「全部」：顯示有 1~3 星的題目
+			  filtered = filtered.filter(q => {
+				const key = `difficulty_${q.class}_${formatSn(q.sn)}`;
+				const rating = parseInt(localStorage.getItem(key)) || 0;
+				return rating >= 1 && rating <= 3;
+			  });
+			} else {
+			  // 特定星數
+			  const starCount = parseInt(selectedStars);
+			  filtered = filtered.filter(q => {
+				const key = `difficulty_${q.class}_${formatSn(q.sn)}`;
+				const rating = parseInt(localStorage.getItem(key)) || 0;
+				return rating === starCount;
+			  });
+			}
+		  }
+
+		  filteredQuestions = filtered;
+		  resetRandomIndices();
+		  currentIndex = 0;
+		  document.getElementById('total-questions').textContent = filteredQuestions.length;
+		  renderQuestion();
+		}
+
 
     function startinfo() {
       window.location.href = 'https://weichen5700.github.io/TLE/info.html';
@@ -1344,24 +1500,24 @@
       }
     }
 
-    function renderQuickNavigation() {
-      const fixedButtonsDiv = document.querySelector('.fixed-buttons');
-      const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
-      const numOptions = currentQuestion.options.length;
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      let colors = ["#ff9999", "#99ff99", "#9999ff", "#ffcc99"];
-      let rowHTML = `<div style="display: flex; gap: 8px; justify-content: center; align-items: center; width: 100%;">`;
-      for (let i = 0; i < numOptions; i++) {
-        let color = colors[i % colors.length];
-        rowHTML += `<button class="btn quick-option-btn" 
-                        style="flex: 1; border: none; border-radius: 0.5rem; padding: 0.5rem; font-size: 1rem; background-color: ${color}; color: white;" 
-                        onclick="selectOption(${i})">
-                          ${letters[i]}
-                      </button>`;
-      }
-      rowHTML += `</div>`;
-      fixedButtonsDiv.innerHTML = rowHTML;
-    }
+	  function renderQuickNavigation(isDisabled = false) {
+	  const fixedButtonsDiv = document.querySelector('.fixed-buttons');
+	  const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
+	  const numOptions = currentQuestion.options.length;
+	  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	  let colors = ["#ff9999", "#99ff99", "#9999ff", "#ffcc99"];
+	  let rowHTML = `<div style="display: flex; gap: 8px; justify-content: center; align-items: center; width: 100%;">`;
+	  for (let i = 0; i < numOptions; i++) {
+		let color = colors[i % colors.length];
+		rowHTML += `<button class="btn quick-option-btn" 
+						style="flex: 1; border: none; border-radius: 0.5rem; padding: 0.5rem; font-size: 1rem; background-color: ${color}; color: white;" 
+						onclick="selectOption(${i})" ${isDisabled ? 'disabled' : ''}>
+						  ${letters[i]}
+					  </button>`;
+	  }
+	  rowHTML += `</div>`;
+	  fixedButtonsDiv.innerHTML = rowHTML;
+	}
 
     function restoreFixedButtons() {
       const fixedButtonsDiv = document.querySelector('.fixed-buttons');
@@ -1370,6 +1526,7 @@
         <button class="btn btn-primary" onclick="nextQuestion()">下一題</button>
       `;
     }
+    
     function highlightCorrectOptions() {
       const options = document.querySelectorAll('.option');
       options.forEach(option => {
@@ -1398,9 +1555,83 @@
     }
 
     // ================================
+    // 記憶模式相關功能
+    // ================================
+		function toggleMemoryMode() {
+		  // 先把目前題目的唯一識別碼記錄下來，讓它像 GPS 一樣，知道你原本在哪裡！
+		  const currentQ = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
+		  const currentUniqueId = currentQ.class + '-' + formatSn(currentQ.sn);
+
+		  // 切換記憶模式狀態
+		  memoryMode = !memoryMode;
+		  if (memoryMode) {
+			document.getElementById('hideAnswers').checked = true;
+			toggleAnswerVisibility();
+		  } else {
+			document.getElementById('hideAnswers').checked = false;
+			toggleAnswerVisibility();
+			document.getElementById('starFilter').value = ''; // 關閉記憶模式時重置過濾
+			filteredQuestions = [...questions];
+			resetRandomIndices();
+			document.getElementById('total-questions').textContent = filteredQuestions.length;
+		  }
+		  
+		  // 根據先前記錄的唯一識別碼，找出新 filteredQuestions 中對應的題目索引
+		  const newIndex = filteredQuestions.findIndex(q => q.class + '-' + formatSn(q.sn) === currentUniqueId);
+		  currentIndex = newIndex !== -1 ? newIndex : 0;
+		  
+		  renderQuestion();
+		}
+
+		function renderDifficultyStars(className, sn) {
+		  const key = `difficulty_${className}_${sn}`;
+		  let rating = parseInt(localStorage.getItem(key)) || 0;
+		  let starsHtml = '<div class="difficulty-stars">';
+		  for (let i = 1; i <= 3; i++) {
+			starsHtml += `<span onclick="setDifficulty('${className}', '${sn}', ${i})" style="font-size:1.5rem; margin-right:2px; color:${i <= rating ? '#fffdd0' : '#ccc'};">★</span>`;
+		  }
+		  starsHtml += '</div>';
+		  const starsContainer = document.getElementById('difficulty-stars-container');
+		  if (starsContainer) {
+			starsContainer.innerHTML = starsHtml;
+		  }
+		}
+    function setDifficulty(className, sn, ratingClicked) {
+      const key = `difficulty_${className}_${sn}`;
+      let currentRating = parseInt(localStorage.getItem(key)) || 0;
+      // 如果點選的星數與目前數量相同，就清除為 0
+      let newRating = (currentRating === ratingClicked) ? 0 : ratingClicked;
+      localStorage.setItem(key, newRating);
+      updateDifficultyStarsUI(className, sn);
+    }
+
+		function updateDifficultyStarsUI(className, sn) {
+		  if (!memoryMode) return;
+		  const key = `difficulty_${className}_${sn}`;
+		  let rating = parseInt(localStorage.getItem(key)) || 0;
+		  const starContainer = document.getElementById('difficulty-stars-container');
+		  if (starContainer) {
+			let starsHtml = '<div class="difficulty-stars">'; // 同樣移除內聯背景樣式
+			for (let i = 1; i <= 3; i++) {
+			  starsHtml += `<span onclick="setDifficulty('${className}', '${sn}', ${i})" style="font-size:1.5rem; margin-right:2px; color:${i <= rating ? '#fffdd0' : '#ccc'};">★</span>`;
+			}
+			starsHtml += '</div>';
+			starContainer.innerHTML = starsHtml;
+		  }
+		}
+		
+    function autoIncreaseDifficulty(className, sn) {
+      const key = `difficulty_${className}_${sn}`;
+      let currentRating = parseInt(localStorage.getItem(key)) || 0;
+      if (currentRating < 3) {
+        currentRating++;
+        localStorage.setItem(key, currentRating);
+      }
+      if (memoryMode) updateDifficultyStarsUI(className, sn);
+    }
+    // ================================
     // 手機滑動優化程式碼區段
     // ================================
-    // 擴大手機模式下的觸控範圍，若在手機（寬度<=576px）則綁定至 body，否則仍用 question-container
     const swipeArea = window.innerWidth <= 576 ? document.body : document.getElementById('question-container');
     let touchStartX = 0, touchEndX = 0;
     let touchStartY = 0, touchEndY = 0;
@@ -1420,7 +1651,6 @@
     function handleSwipe() {
       const deltaX = touchEndX - touchStartX;
       const deltaY = touchEndY - touchStartY;
-      // 若水平位移超過閾值，且至少為垂直位移的兩倍，則認定為左右滑動
       if (Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaX) > 2 * Math.abs(deltaY)) {
         if (deltaX > 0) {
           prevQuestion();
@@ -1428,11 +1658,39 @@
           nextQuestion();
         }
       } else if (Math.abs(deltaY) > minSwipeDistance) {
-        // 垂直滑動，可依需求在此處添加其他功能
         console.log(deltaY > 0 ? '向下滑動' : '向上滑動');
       }
     }
-    // ================================
+	
+	function filterByStars() {
+	  if (!memoryMode) {
+		alert('請先啟用記憶模式以使用星數過濾');
+		document.getElementById('starFilter').value = '';
+		return;
+	  }
+	  const selectedStars = document.getElementById('starFilter').value;
+	  if (selectedStars === '') {
+		// 當選擇「全部」時，只過濾出星數為 1 至 3 的題目
+		filteredQuestions = questions.filter(q => {
+		  const key = `difficulty_${q.class}_${formatSn(q.sn)}`;
+		  const rating = parseInt(localStorage.getItem(key)) || 0;
+		  return rating >= 1 && rating <= 3;
+		});
+	  } else {
+		const starCount = parseInt(selectedStars);
+		filteredQuestions = questions.filter(q => {
+		  const key = `difficulty_${q.class}_${formatSn(q.sn)}`;
+		  const rating = parseInt(localStorage.getItem(key)) || 0;
+		  return rating === starCount;
+		});
+	  }
+	  resetRandomIndices();
+	  currentIndex = 0;
+	  document.getElementById('total-questions').textContent = filteredQuestions.length;
+	  renderQuestion();
+	}
+	
+
   </script>
 </body>
 </html>
