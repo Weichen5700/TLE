@@ -127,7 +127,63 @@
             border-radius: 0.9375rem;
             box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
             margin-top: 0.75rem;
+			position: relative;
         }
+		
+		#question-block {
+			position: relative;
+			padding-bottom: 5rem; /* 為底部按鈕留出空間 */
+		}
+
+		/* 調整按鈕容器為置中 */
+			.nav-buttons {
+			position: fixed;
+			bottom: 1rem;
+			left: 0;
+			right: 0;
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			z-index: 1000;
+			transform: none; /* 移除 translateX，讓左右邊距控制置中 */
+		}
+		
+		.timer-container {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		/* 結束測驗按鈕的預設樣式 */
+		.end-test-btn {
+			margin-top: 1.5rem;
+			text-align: center;
+		}
+		
+		/* 字體調整按鈕樣式 */
+		.font-controls {
+			position: absolute;
+			bottom: 1rem;
+			right: 1rem;
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.font-btn {
+			width: 2rem;
+			height: 2rem;
+			border-radius: 50%;
+			background-color: #4a90e2;
+			color: white;
+			border: none;
+			font-size: 1rem;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background-color 0.3s ease;
+		}
+
 
         #question-title {
             color: #4a90e2;
@@ -188,6 +244,15 @@
         .hidden {
             display: none;
         }
+		.question-circle {
+		  display: inline-block;
+		  width: 20px;
+		  height: 20px;
+		  margin: 3px;
+		  border-radius: 50%;
+		  cursor: pointer;
+		  border: 1px solid #ccc;
+		}
 
         @media (max-width: 576px) {
             body {
@@ -218,11 +283,41 @@
             .btn {
                 width: 100%;
                 margin-bottom: 0.5rem;
-            }
-            .horizontal-layout {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+            }           
+			.end-test-btn {
+				position: fixed;
+				top: 1rem;
+				right: 1rem;
+				margin-top: 0;
+				z-index: 1000;
+			}
+			.end-test-btn .btn-danger {
+				width: auto; /* 在手機模式下不強制全寬 */
+				padding: 0.5rem 1rem;
+			}
+		   .horizontal-layout {
+				padding-top: 0; /* 如果不需要額外空間的話，可以調整 */
+			}
+			.timer-container {
+				position: relative; /* 或直接移除 position 屬性 */
+				top: auto;
+				right: auto;
+			}
+			.timer-container .btn-danger {
+				padding: 0.4rem 0.8rem;
+				font-size: 0.85rem;
+			}
+			.nav-buttons {
+				bottom: 0.5rem; /* 更靠近底部 */
+				gap: 0.5rem;
+			}
+			.nav-buttons .btn-secondary {
+				padding: 0.5rem 1rem;
+				font-size: 0.9rem;
+			}
+			#question-block {
+				padding-top: 0rem; /* 為頂部空間留出餘裕 */
+			}	
         }
 
         @media (min-width: 577px) and (max-width: 768px) {
@@ -235,6 +330,9 @@
             .chart {
                 height: 18rem;
             }
+			.nav-buttons {
+				gap: 1.5rem; /* 增加間距以容納結束測驗按鈕 */  
+			}
         }
     </style>
 </head>
@@ -284,8 +382,8 @@
         </div>
         <div class="col-md-6 col-12">
             <div class="section">
-                <h5>Felo 關鍵字過濾 (用逗號分隔)：</h5>
-                <input type="text" id="feloFilter" class="form-control" placeholder="輸入要過濾的felo關鍵字">
+                <h5>筆記關鍵字過濾 (用逗號分隔)：</h5>
+                <input type="text" id="feloFilter" class="form-control" placeholder="輸入要過濾的筆記關鍵字">
             </div>
         </div>
         <div class="col-md-6 col-12">
@@ -331,37 +429,58 @@
         </div>
     </div>
 
-    <div id="question-block" class="question-block hidden row">
-        <div class="col-12 horizontal-layout">
-            <div id="progress">
-                <span id="current-question">1</span> / <span id="total-question-count">0</span>
-            </div>
-            <div id="timer">00:00:00</div>
-        </div>
-        <div class="col-12" id="question-container">
-            <h3 id="question-title" class="mt-3"></h3>
-            <div id="options" class="mt-3"></div>
-        </div>
-        <div class="col-12 d-flex justify-content-between mt-3">
-            <button class="btn btn-secondary" onclick="prevQuestion()">上一題</button>
-            <button class="btn btn-secondary" onclick="nextQuestion()">下一題</button>
-        </div>
-        <div class="col-12">
-            <button class="btn btn-danger mt-3" onclick="confirmEndTest()">結束測驗</button>
-        </div>
-    </div>
+	<div id="question-block" class="question-block hidden row">
+		<div class="col-12 horizontal-layout">
+			<div id="progress">
+				<span id="current-question">1</span> / <span id="total-question-count">0</span>
+			</div>
+			<div class="timer-container">
+				<div id="timer">00:00:00</div>
+				<button class="btn btn-danger" onclick="confirmEndTest()">結束測驗</button>
+			</div>
+		</div>
+		<div class="col-12" id="question-container">
+			<h3 id="question-title" class="mt-3" style="font-size: 1.4rem;"></h3>
+			<div id="options" class="mt-3" style="font-size: 1.2rem;"></div>
+			<!-- 字體控制按鈕 -->
+			<div class="font-controls">
+				<button class="font-btn" onclick="changeFontSize(0.2)">A+</button>
+				<button class="font-btn" onclick="changeFontSize(-0.2)">A-</button>
+			</div>
+		</div>
+		<!-- 固定底部導航按鈕 -->
+		<div class="nav-buttons">
+			<button class="btn btn-secondary" onclick="prevQuestion()">上一題</button>
+			<button class="btn btn-secondary" onclick="nextQuestion()">下一題</button>
+		</div>
+	</div>
 
-    <div id="result-dialog" class="result-dialog hidden marquee-border row">
-        <div class="col-12">
-            <h5>4. 測試成績</h5>
-            <div id="chart_div" class="chart"></div>
-            <div class="text-center mt-3">
-                <button class="btn btn-primary mt-3" onclick="retakeTest()">再次測試</button>
-                <button class="btn btn-secondary mt-3" onclick="reviewErrors()">錯題複習</button>
-                <button class="btn btn-primary mt-3" onclick="returnToTest()">返回測試</button>
-            </div>
-        </div>
-    </div>
+	 <div id="result-dialog" class="result-dialog hidden marquee-border row">
+		<div class="col-12">
+			<h5>4. 測試成績</h5>
+			<div id="chart_div" class="chart"></div>
+			<!-- 新增統計資訊 -->
+			<div id="result-stats" class="text-center mt-3">
+				<p>總題數: <span id="total-stats">0</span> | 正確答題: <span id="correct-stats">0</span> | 錯誤: <span id="incorrect-stats">0</span> | 未選擇: <span id="unanswered-stats">0</span></p>
+			</div>
+			<!-- 新增顯示/隱藏題目總覽的切換按鈕 -->
+				<div class="text-center mt-3">
+				  <button class="btn btn-info" onclick="toggleQuestionSummary()">顯示/隱藏 題目總覽</button>
+				</div>
+
+				<!-- 新增題目總覽區塊，預設隱藏 -->
+				<div id="question-summary-container" class="text-center mt-3 hidden">
+				  <div id="question-summary">
+					<!-- JavaScript 將在此動態生成每題狀態的圓圈 -->
+				  </div>
+				</div>
+			<div class="text-center mt-3">
+				<button class="btn btn-primary mt-3" onclick="retakeTest()">重新設定考試條件</button>
+				<button class="btn btn-secondary mt-3" onclick="reviewErrors()">此次錯題再次測驗</button>
+				<button class="btn btn-primary mt-3" onclick="returnToTest()">試題分析</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
@@ -585,6 +704,7 @@ function startTimer() {
 
 let answers = [];
 
+// 在 renderQuestion 函數中確保字體大小一致
 function renderQuestion() {
     if (!filteredQuestions.length) {
         console.warn('filteredQuestions 為空，無法渲染題目');
@@ -592,6 +712,8 @@ function renderQuestion() {
     }
 
     const question = filteredQuestions[currentQuestionIndex];
+
+    
     if (!question) {
         console.error('當前題目未定義，currentQuestionIndex:', currentQuestionIndex);
         return;
@@ -647,6 +769,16 @@ function renderQuestion() {
     }).join('');
 
     document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+
+    // 應用儲存的字體大小
+    const savedQuestionSize = localStorage.getItem('questionFontSize') || 1.4;
+    const savedOptionSize = localStorage.getItem('optionFontSize') || 1.2;
+    document.getElementById('question-title').style.fontSize = `${savedQuestionSize}rem`;
+    optionsDiv.style.fontSize = `${savedOptionSize}rem`;
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => {
+        option.style.fontSize = `${savedOptionSize}rem`;
+    });
 }
 
 
@@ -773,6 +905,7 @@ function confirmEndTest() {
 function endTest() {
     clearInterval(timer);
     calculateResults();
+	generateQuestionSummary(); // 新增呼叫：生成題目總覽
     document.getElementById('question-block').classList.add('hidden');
     document.getElementById('result-dialog').classList.remove('hidden');
     document.getElementById('page-title').style.display = 'block';
@@ -780,36 +913,57 @@ function endTest() {
     drawChart();
 }
 
+// 修改 calculateResults 函數以計算未選擇的題目
 function calculateResults() {
     correctCount = 0;
     incorrectCount = 0;
+    let unansweredCount = 0;
 
     filteredQuestions.forEach((question, index) => {
         const userAnswer = answers[index] || [];
         const correctOptions = question.options.filter(opt => opt.answer).map(opt => opt.option);
 
         if (Array.isArray(userAnswer)) {
-            const isCorrect = userAnswer.length === correctOptions.length && userAnswer.every(opt => correctOptions.includes(opt));
-            if (isCorrect) correctCount++;
-            else incorrectCount++;
+            if (userAnswer.length === 0) {
+                unansweredCount++;
+            } else {
+                const isCorrect = userAnswer.length === correctOptions.length && userAnswer.every(opt => correctOptions.includes(opt));
+                if (isCorrect) correctCount++;
+                else incorrectCount++;
+            }
         } else {
-            if (userAnswer === correctOptions[0]) correctCount++;
-            else incorrectCount++;
+            if (!userAnswer) {
+                unansweredCount++;
+            } else if (userAnswer === correctOptions[0]) {
+                correctCount++;
+            } else {
+                incorrectCount++;
+            }
         }
     });
+
+    // 更新統計顯示
+    document.getElementById('total-stats').textContent = filteredQuestions.length;
+    document.getElementById('correct-stats').textContent = correctCount;
+    document.getElementById('incorrect-stats').textContent = incorrectCount;
+    document.getElementById('unanswered-stats').textContent = unansweredCount;
 }
 
 function drawChart() {
     const data = google.visualization.arrayToDataTable([
         ['Result', 'Count'],
         ['正確', correctCount],
-        ['錯誤', incorrectCount]
+        ['錯誤', incorrectCount],
+        ['未選擇', parseInt(document
+
+    
+.getElementById('unanswered-stats').textContent)]
     ]);
 
     const options = {
-        title: `正確率: ${(correctCount / (correctCount + incorrectCount) * 100).toFixed(2)}%`,
+        title: `正確率: ${(correctCount / filteredQuestions.length * 100).toFixed(2)}%`,
         pieHole: 0.4,
-        colors: ['#28a745', '#dc3545']
+        colors: ['#28a745', '#dc3545', '#a0aec0'] // 新增未選擇的顏色
     };
 
     const chart = new google.visualization.PieChart(document.getElementById('chart_div'));
@@ -855,16 +1009,134 @@ function retakeTest() {
     document.getElementById('page-title').textContent = "設定模擬考試項目";
 }
 
-function returnToTest() {
-    isReviewMode = true;
-    currentQuestionIndex = 0;
-    document.getElementById('result-dialog').classList.add('hidden');
-    document.getElementById('question-block').classList.remove('hidden');
-    document.getElementById('page-title').style.display = 'none';
-    renderQuestion();
+function returnToTest(questionIndex) {
+  if (typeof questionIndex === 'undefined') {
+    currentQuestionIndex = 0; // 沒有參數時回到第一題
+  } else {
+    currentQuestionIndex = questionIndex;
+  }
+  isReviewMode = true;
+  document.getElementById('result-dialog').classList.add('hidden');
+  document.getElementById('question-block').classList.remove('hidden');
+  document.getElementById('page-title').style.display = 'none';
+  renderQuestion();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTitle = document.getElementById('question-title');
+    const optionsDiv = document.getElementById('options');
+
+    let savedQuestionSize = localStorage.getItem('questionFontSize');
+    let savedOptionSize = localStorage.getItem('optionFontSize');
+
+    // 如果沒有儲存值或值異常，設置默認值
+    if (!savedQuestionSize || isNaN(savedQuestionSize) || savedQuestionSize < 0.8 || savedQuestionSize > 2.0) {
+        savedQuestionSize = 1.4; // 默認題目字體大小
+        localStorage.setItem('questionFontSize', savedQuestionSize);
+    }
+    if (!savedOptionSize || isNaN(savedOptionSize) || savedOptionSize < 0.8 || savedOptionSize > 2.0) {
+        savedOptionSize = 1.2; // 默認選項字體大小
+        localStorage.setItem('optionFontSize', savedOptionSize);
+    }
+
+    questionTitle.style.fontSize = `${savedQuestionSize}rem`;
+    optionsDiv.style.fontSize = `${savedOptionSize}rem`;
+});
+
+function changeFontSize(delta) {
+    const questionTitle = document.getElementById('question-title');
+    const optionsDiv = document.getElementById('options');
+    
+    let currentQuestionSize = parseFloat(window.getComputedStyle(questionTitle).fontSize) / 16 || 1.4;
+    let currentOptionSize = parseFloat
+
+    
+(window.getComputedStyle(optionsDiv).fontSize) / 16 || 1.2;
+    
+    // 調整並限制字體大小範圍
+    currentQuestionSize = Math.max(0.8, Math.min(2.0, currentQuestionSize + delta));
+    currentOptionSize = Math.max(0.8, Math.min(2.0, currentOptionSize + delta));
+    
+    questionTitle.style.fontSize = `${currentQuestionSize}rem`;
+    optionsDiv.style.fontSize = `${currentOptionSize}rem`;
+    
+    // 儲存到 localStorage
+    localStorage.setItem('questionFontSize', currentQuestionSize);
+    localStorage.setItem('optionFontSize', currentOptionSize);
+
+    // 確保選項內的文字也更新（避免被其他樣式覆蓋）
+    const options = document.querySelectorAll('.option');
+    options.forEach(option => {
+        option.style.fontSize = `${currentOptionSize}rem`;
+    });
+}
+
+function toggleQuestionSummary() {
+  const summaryContainer = document.getElementById('question-summary-container');
+  summaryContainer.classList.toggle('hidden');
+}
+
+// 根據每題回答狀態生成總覽小圓圈（讓你一目了然，每題狀態都不藏著掖著）
+function generateQuestionSummary() {
+  const summaryDiv = document.getElementById('question-summary');
+  summaryDiv.innerHTML = '';
+  filteredQuestions.forEach((question, index) => {
+    let statusColor = '#ffc107'; // 預設黃色：未選擇
+    const userAnswer = answers[index] || null;
+    const correctOptions = question.options.filter(opt => opt.answer).map(opt => opt.option);
+    
+    if (userAnswer) {
+      if (Array.isArray(userAnswer)) {
+        if (userAnswer.length === 0) {
+          statusColor = '#ffc107';
+        } else if (userAnswer.length === correctOptions.length && userAnswer.every(opt => correctOptions.includes(opt))) {
+          statusColor = '#28a745'; // 答對：綠色
+        } else {
+          statusColor = '#dc3545'; // 答錯：紅色
+        }
+      } else {
+        if (userAnswer === correctOptions[0]) {
+          statusColor = '#28a745';
+        } else {
+          statusColor = '#dc3545';
+        }
+      }
+    }
+    
+    // 建立一個容器來包含題號與圓圈
+    const circleContainer = document.createElement('span');
+    circleContainer.style.display = 'inline-block';
+    circleContainer.style.margin = '3px';
+    
+    // 建立題號文字
+    const qNumText = document.createElement('span');
+    qNumText.textContent = (index + 1) + ". ";
+    qNumText.style.cursor = 'pointer';
+    // 點擊題號文字也會跳轉到該題（可選）
+    qNumText.onclick = function() {
+      returnToTest(index);
+    };
+
+    // 建立小圓圈
+    const circle = document.createElement('span');
+    circle.className = 'question-circle';
+    circle.style.backgroundColor = statusColor;
+    circle.title = `第 ${index + 1} 題`;
+    circle.onclick = function() {
+      // 點擊圓圈直接跳轉到該題
+      returnToTest(index);
+    };
+
+    circleContainer.appendChild(qNumText);
+    circleContainer.appendChild(circle);
+    summaryDiv.appendChild(circleContainer);
+  });
+}
+
+
+
 function startinfo() {
-            window.location.href = 'https://weichen5700.github.io/BotExamForever/info.html'; // 假設複習頁面命名為 review.html
+            window.location.href = 'https://weichen5700.github.io/TLE/info.html'; // 假設複習頁面命名為 review.html
         }
 
 </script>
