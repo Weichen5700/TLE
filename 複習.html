@@ -469,10 +469,12 @@
       <button class="mobile-note-btn" onclick="toggleMobileNotes()">圖</button>
       <button class="mobile-copy-search-btn" onclick="copyAndSearchFelo()">搜</button>
       <button class="mobile-quick-btn" onclick="toggleQuickMode()">快</button>
-      <div class="col-12">
-        <!-- 注意：question-container 內容會由 renderQuestion() 渲染 -->
-        <div id="question-container" class="question-block" style="position: relative;"></div>
-      </div>
+	  <div class="question-wrapper" style="position: relative; display: inline-block;">
+		  <div class="col-12">
+			<!-- 注意：question-container 內容會由 renderQuestion() 渲染 -->
+			<div id="question-container" class="question-block" style="position: relative;"></div>
+		  </div>
+	  </div>
     </div>
 
     <div class="row">
@@ -866,13 +868,14 @@
         const adjuster = document.createElement('div');
         adjuster.id = 'font-adjuster';
         adjuster.style.position = 'absolute';
-        adjuster.style.top = '5px';    // 從底部改到頂部
-		adjuster.style.right = '5px';
+        adjuster.style.top  = '-15px';    // 從底部改到頂部
+		adjuster.style.right = '20px';
         adjuster.style.display = 'flex';
         adjuster.style.gap = '5px';
         adjuster.innerHTML = '<button id="font-decrease" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A-</button>' +
                               '<button id="font-increase" style="border-radius: 50%; width: 30px; height: 30px; font-size: 0.8rem;">A+</button>';
-        questionContainer.appendChild(adjuster);
+        const wrapper = document.querySelector('.question-wrapper');
+		wrapper.appendChild(adjuster);
         document.getElementById('font-increase').addEventListener('click', function() {
           let currentSize = parseFloat(window.getComputedStyle(questionContainer).fontSize);
           let newSize = currentSize + 1;
