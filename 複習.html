@@ -24,10 +24,7 @@
       line-height: 1.6;
       letter-spacing: 0.02em;
     }
-	.option > div {
-		display: inline;
-	}
-
+	
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -352,9 +349,14 @@
 	  font-weight: bold !important;
 	}
     .dark-mode .option.answer {
-      background-color: #b2bec3;
-      color: #2d3436;
+      background-color: #b2bec3 !important;
+      color: #2d3436 !important;
     }
+	.dark-mode .options div:hover {
+		background-color: #4a4a4a !important;
+		box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
+	}
+
     .dark-mode .fixed-buttons {
       background-color: #2d3436;
     }
