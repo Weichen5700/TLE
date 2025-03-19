@@ -1510,24 +1510,51 @@
       }
     }
 
-	  function renderQuickNavigation(isDisabled = false) {
-	  const fixedButtonsDiv = document.querySelector('.fixed-buttons');
-	  const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
-	  const numOptions = currentQuestion.options.length;
-	  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	  let colors = ["#ff9999", "#99ff99", "#9999ff", "#ffcc99"];
-	  let rowHTML = `<div style="display: flex; gap: 8px; justify-content: center; align-items: center; width: 100%;">`;
-	  for (let i = 0; i < numOptions; i++) {
-		let color = colors[i % colors.length];
-		rowHTML += `<button class="btn quick-option-btn" 
-						style="flex: 1; border: none; border-radius: 0.5rem; padding: 0.5rem; font-size: 1rem; background-color: ${color}; color: white;" 
-						onclick="selectOption(${i})" ${isDisabled ? 'disabled' : ''}>
-						  ${letters[i]}
-					  </button>`;
-	  }
-	  rowHTML += `</div>`;
-	  fixedButtonsDiv.innerHTML = rowHTML;
-	}
+	function renderQuickNavigation(isDisabled = false) {
+		  const fixedButtonsDiv = document.querySelector('.fixed-buttons');
+		  const currentQuestion = filteredQuestions[randomOrder ? randomIndices[currentIndex] : currentIndex];
+		  const numOptions = currentQuestion.options.length;
+		  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		  
+		  // 建立外層容器：左右分布，上/下一題箭頭永遠可點，中間區域依答案選擇狀態禁用
+		  let rowHTML = `<div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; width: 100%;">`;
+		  
+		  // 左側：上一題箭頭 (永遠有效)
+		  rowHTML += `<button class="btn" onclick="prevQuestion()" style="font-size: 1.5rem;">←</button>`;
+		  
+		  // 中間容器：包含複選題的送出按鈕與快速選項按鈕
+		  rowHTML += `<div style="display: flex; gap: 8px; flex-grow: 1; justify-content: center; align-items: center;">`;
+		  
+		  // 複選題：送出答案按鈕（方形），背景色改為淺藍色，文字白色
+		  const isMultiple = currentQuestion.options.filter(opt => opt.answer === true).length > 1;
+		  if (isMultiple) {
+			rowHTML += `<button class="btn" onclick="checkMultipleChoice()" ${isDisabled ? 'disabled' : ''} 
+			  style="width: 40px; height: 40px; padding: 0; border-radius: 0; background-color: #a1cfff; color: white; font-size: 1.2rem;">■</button>`;
+		  }
+		  
+		  // 快速選項按鈕：圓形按鈕，顯示 A、B、C...，答案選擇後禁用
+		  let colors = ["#ff9999", "#99ff99", "#9999ff", "#ffcc99", "#a1cfff"];
+		  for (let i = 0; i < numOptions; i++) {
+			let color = colors[i % colors.length];
+			rowHTML += `<button class="btn" 
+				 style="width: 40px; height: 40px; padding: 0; border-radius: 50%; font-size: 1rem; background-color: ${color}; color: white; display: flex; align-items: center; justify-content: center;" 
+				 onclick="selectOption(${i})" ${isDisabled ? 'disabled' : ''}>
+				  ${letters[i]}
+			  </button>`;
+		  }
+		  rowHTML += `</div>`; // 結束中間容器
+		  
+		  // 右側：下一題箭頭 (永遠有效)
+		  rowHTML += `<button class="btn" onclick="nextQuestion()" style="font-size: 1.5rem;">→</button>`;
+		  
+		  rowHTML += `</div>`;
+		  fixedButtonsDiv.innerHTML = rowHTML;
+		}
+
+
+
+
+
 
     function restoreFixedButtons() {
       const fixedButtonsDiv = document.querySelector('.fixed-buttons');
